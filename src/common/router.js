@@ -72,76 +72,85 @@ export const getRouterData = app => {
     '/': {
       component: dynamicWrapper(app, ['user', 'login'], () => import('../layouts/BasicLayout')),
     },
-    '/dashboard/analysis': {
-      component: dynamicWrapper(app, ['chart'], () => import('../routes/Dashboard/Analysis')),
+    '/businessManagement/inManagement': {
+      component: dynamicWrapper(app, [], () => import('../routes/Business/InManagement')),
     },
-    '/dashboard/monitor': {
-      component: dynamicWrapper(app, ['monitor'], () => import('../routes/Dashboard/Monitor')),
+    '/businessManagement/outManagement/application': {
+      component: dynamicWrapper(app, [], () => import('../routes/Business/Application')),
     },
-    '/dashboard/workplace': {
-      component: dynamicWrapper(app, ['project', 'activities', 'chart'], () =>
-        import('../routes/Dashboard/Workplace')
-      ),
-      // hideInBreadcrumb: true,
-      // name: '工作台',
-      // authority: 'admin',
+    '/businessManagement/outManagement/approve': {
+      component: dynamicWrapper(app, [], () => import('../routes/Business/Approve')),
     },
-    '/form/basic-form': {
-      component: dynamicWrapper(app, ['form'], () => import('../routes/Forms/BasicForm')),
+    '/businessManagement/outManagement/outbound': {
+      component: dynamicWrapper(app, [], () => import('../routes/Business/Outbound')),
     },
-    '/form/step-form': {
-      component: dynamicWrapper(app, ['form'], () => import('../routes/Forms/StepForm')),
+    '/businessManagement/circulateManagement/application': {
+      component: dynamicWrapper(app, [], () => import('../routes/Circulate/Application')),
     },
-    '/form/step-form/info': {
-      name: '分步表单（填写转账信息）',
-      component: dynamicWrapper(app, ['form'], () => import('../routes/Forms/StepForm/Step1')),
+    '/businessManagement/circulateManagement/approve': {
+      component: dynamicWrapper(app, [], () => import('../routes/Circulate/Approve')),
     },
-    '/form/step-form/confirm': {
-      name: '分步表单（确认转账信息）',
-      component: dynamicWrapper(app, ['form'], () => import('../routes/Forms/StepForm/Step2')),
+    '/businessManagement/circulateManagement/outbound': {
+      component: dynamicWrapper(app, [], () => import('../routes/Circulate/Outbound')),
     },
-    '/form/step-form/result': {
-      name: '分步表单（完成）',
-      component: dynamicWrapper(app, ['form'], () => import('../routes/Forms/StepForm/Step3')),
+    '/businessManagement/circulateManagement/return': {
+      component: dynamicWrapper(app, [], () => import('../routes/Circulate/Return')),
     },
-    '/form/advanced-form': {
-      component: dynamicWrapper(app, ['form'], () => import('../routes/Forms/AdvancedForm')),
+    '/businessManagement/missingManagement': {
+      component: dynamicWrapper(app, [], () => import('../routes/Circulate/Missing')),
     },
-    '/list/table-list': {
-      component: dynamicWrapper(app, ['rule'], () => import('../routes/List/TableList')),
+    '/stockManagement/virtualStorage': {
+      component: dynamicWrapper(app, [], () => import('../routes/Stock/VirtualStorage')),
     },
-    '/list/basic-list': {
-      component: dynamicWrapper(app, ['list'], () => import('../routes/List/BasicList')),
+    '/stockManagement/stockInquiry': {
+      component: dynamicWrapper(app, [], () => import('../routes/Stock/StockInquiry')),
     },
-    '/list/card-list': {
-      component: dynamicWrapper(app, ['list'], () => import('../routes/List/CardList')),
+    '/stockManagement/detailedQuery': {
+      component: dynamicWrapper(app, [], () => import('../routes/Stock/DetailedQuery')),
     },
-    '/list/search': {
-      component: dynamicWrapper(app, ['list'], () => import('../routes/List/List')),
+    '/stockManagement/moveManagement': {
+      component: dynamicWrapper(app, [], () => import('../routes/Stock/MoveManagement')),
     },
-    '/list/search/projects': {
-      component: dynamicWrapper(app, ['list'], () => import('../routes/List/Projects')),
+    '/stockManagement/inventoryManagement': {
+      component: dynamicWrapper(app, [], () => import('../routes/Stock/InventoryManagement')),
     },
-    '/list/search/applications': {
-      component: dynamicWrapper(app, ['list'], () => import('../routes/List/Applications')),
+    '/stockManagement/reports': {
+      component: dynamicWrapper(app, [], () => import('../routes/Stock/Reports')),
     },
-    '/list/search/articles': {
-      component: dynamicWrapper(app, ['list'], () => import('../routes/List/Articles')),
+    '/infoManagement/stockInfo': {
+      component: dynamicWrapper(app, [], () => import('../routes/Info/StockInfo')),
     },
-    '/profile/basic': {
-      component: dynamicWrapper(app, ['profile'], () => import('../routes/Profile/BasicProfile')),
+    '/infoManagement/materialKindInfo': {
+      component: dynamicWrapper(app, [], () => import('../routes/Info/MaterialKindInfo')),
     },
-    '/profile/advanced': {
-      component: dynamicWrapper(app, ['profile'], () =>
-        import('../routes/Profile/AdvancedProfile')
-      ),
+    '/infoManagement/materialInfo': {
+      component: dynamicWrapper(app, [], () => import('../routes/Info/MaterialInfo')),
     },
-    '/result/success': {
-      component: dynamicWrapper(app, [], () => import('../routes/Result/Success')),
+    '/infoManagement/measureUnit': {
+      component: dynamicWrapper(app, [], () => import('../routes/Info/MeasureUnit')),
     },
-    '/result/fail': {
-      component: dynamicWrapper(app, [], () => import('../routes/Result/Error')),
+    '/infoManagement/classInfo': {
+      component: dynamicWrapper(app, [], () => import('../routes/Info/ClassInfo')),
     },
+    '/infoManagement/usingInfo': {
+      component: dynamicWrapper(app, [], () => import('../routes/Info/UsingInfo')),
+    },
+    '/infoManagement/supplierInfo': {
+      component: dynamicWrapper(app, [], () => import('../routes/Info/SupplierInfo')),
+    },
+    '/userManagement/basicInfoManagement/userInfoManagement': {
+      component: dynamicWrapper(app, [], () => import('../routes/User/UserInfoManagement')),
+    },
+    '/userManagement/basicInfoManagement/infoManagement': {
+      component: dynamicWrapper(app, [], () => import('../routes/User/InfoManagement')),
+    },
+    '/userManagement/roleManagement': {
+      component: dynamicWrapper(app, [], () => import('../routes/User/RoleManagement')),
+    },
+
+
+
+
     '/exception/403': {
       component: dynamicWrapper(app, [], () => import('../routes/Exception/403')),
     },

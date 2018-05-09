@@ -2,155 +2,149 @@ import { isUrl } from '../utils/utils';
 
 const menuData = [
   {
-    name: 'dashboard',
-    icon: 'dashboard',
-    path: 'dashboard',
-    children: [
-      {
-        name: '分析页',
-        path: 'analysis',
-      },
-      {
-        name: '监控页',
-        path: 'monitor',
-      },
-      {
-        name: '工作台',
-        path: 'workplace',
-        // hideInBreadcrumb: true,
-        // hideInMenu: true,
-      },
-    ],
-  },
-  {
-    name: '表单页',
+    name: '业务管理',
     icon: 'form',
-    path: 'form',
+    path: 'businessManagement',
     children: [
       {
-        name: '基础表单',
-        path: 'basic-form',
+        name: '入库管理',
+        path: 'inManagement',
       },
       {
-        name: '分步表单',
-        path: 'step-form',
-      },
-      {
-        name: '高级表单',
-        authority: 'admin',
-        path: 'advanced-form',
-      },
-    ],
-  },
-  {
-    name: '列表页',
-    icon: 'table',
-    path: 'list',
-    children: [
-      {
-        name: '查询表格',
-        path: 'table-list',
-      },
-      {
-        name: '标准列表',
-        path: 'basic-list',
-      },
-      {
-        name: '卡片列表',
-        path: 'card-list',
-      },
-      {
-        name: '搜索列表',
-        path: 'search',
+        name: '出库管理',
+        path: 'outManagement',
         children: [
           {
-            name: '搜索列表（文章）',
-            path: 'articles',
+            name: '领料申请',
+            path: 'application',
           },
           {
-            name: '搜索列表（项目）',
-            path: 'projects',
+            name: '领料审批',
+            path: 'approve',
           },
           {
-            name: '搜索列表（应用）',
-            path: 'applications',
+            name: '拣货出库',
+            path: 'outbound',
           },
         ],
       },
+      {
+        name: '借还管理',
+        path: 'circulateManagement',
+        children: [
+          {
+            name: '借出申请',
+            path: 'application',
+          },
+          {
+            name: '借出审批',
+            path: 'approve',
+          },
+          {
+            name: '出货',
+            path: 'outbound',
+          },
+          {
+            name: '归还管理',
+            path: 'return',
+          },
+        ],
+      },
+      {
+        name: '缺失管理',
+        path: 'missingManagement',
+      },
     ],
   },
+
   {
-    name: '详情页',
-    icon: 'profile',
-    path: 'profile',
+    name: ' 库存管理',
+    icon: '',
+    path: 'stockManagement',
     children: [
       {
-        name: '基础详情页',
-        path: 'basic',
+        name: '虚拟仓库',
+        path: 'virtualStorage',
       },
       {
-        name: '高级详情页',
-        path: 'advanced',
-        authority: 'admin',
+        name: '库存查询',
+        path: 'stockInquiry',
+      },
+      {
+        name: '明细查询',
+        path: 'detailedQuery',
+      },
+      {
+        name: '移库管理',
+        path: 'moveManagement',
+      },
+      {
+        name: '盘点管理',
+        path: 'inventoryManagement',
+      },
+      {
+        name: '统计报表',
+        path: 'reports',
       },
     ],
   },
   {
-    name: '结果页',
-    icon: 'check-circle-o',
-    path: 'result',
+    name: '基础信息管理',
+    icon: '',
+    path: 'infoManagement',
     children: [
       {
-        name: '成功',
-        path: 'success',
+        name: '仓库信息',
+        path: 'stockInfo',
       },
       {
-        name: '失败',
-        path: 'fail',
+        name: '物料分类信息',
+        path: 'materialKindInfo',
+      },
+      {
+        name: '物料信息',
+        path: 'materialInfo',
+      },
+      {
+        name: '计量单位',
+        path: 'measureUnit',
+      },
+      {
+        name: '班级信息',
+        path: 'classInfo',
+      },
+      {
+        name: '用途信息',
+        path: 'usingInfo',
+      },
+      {
+        name: '供应商信息',
+        path: 'supplierInfo',
       },
     ],
   },
   {
-    name: '异常页',
-    icon: 'warning',
-    path: 'exception',
-    children: [
-      {
-        name: '403',
-        path: '403',
-      },
-      {
-        name: '404',
-        path: '404',
-      },
-      {
-        name: '500',
-        path: '500',
-      },
-      {
-        name: '触发异常',
-        path: 'trigger',
-        hideInMenu: true,
-      },
-    ],
-  },
-  {
-    name: '账户',
+    name: '用户管理',
     icon: 'user',
-    path: 'user',
-    authority: 'guest',
+    path: 'userManagement',
     children: [
       {
-        name: '登录',
-        path: 'login',
+        name: '用户基础信息管理',
+        path: 'basicInfoManagement',
+        children: [
+          {
+            name: '用户信息管理',
+            path: 'userInfoManagement',
+          },
+          {
+            name: '个人信息管理',
+            path: 'infoManagement',
+          },
+        ],
       },
       {
-        name: '注册',
-        path: 'register',
-      },
-      {
-        name: '注册结果',
-        path: 'register-result',
+        name: '角色管理',
+        path: 'roleManagement',
       },
     ],
   },
