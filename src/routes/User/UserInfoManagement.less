@@ -1,0 +1,80 @@
+@import "~antd/lib/style/themes/default.less";
+@import "../../utils/utils.less";
+
+.main {
+  .containerBody;
+  :global {
+    .ant-checkbox-group-item {
+      display: inline-block;
+      margin-top: 10px;
+      width: 33%;
+    }
+  }
+}
+
+.pagination {
+  .paginationAll;
+}
+.header {
+
+}
+
+.tableContainer {
+  background-color: white;
+  border: 1px solid #efefef;
+  border-radius: 10px;
+  flex: 1;
+  overflow: hidden;
+  .mt10;
+}
+
+.table {
+  .bgWhite;
+  :global {
+    .ant-table-thead > tr > th,
+    .ant-table-tbody > tr > td {
+      padding: 16px 0;
+      text-align: center;
+    }
+    .ant-table-thead > tr > th:nth-child(1),
+    .ant-table-tbody > tr > td:nth-child(1) {
+      width: 5%;
+    }
+    .ant-table-thead > tr > th:nth-child(2),
+    .ant-table-tbody > tr > td:nth-child(2) {
+      width: 10%;
+    }
+    .ant-table-thead > tr > th:nth-child(3),
+    .ant-table-tbody > tr > td:nth-child(3) {
+      width: 10%;
+    }
+    .ant-table-thead > tr > th:nth-child(4),
+    .ant-table-tbody > tr > td:nth-child(4) {
+      width: 5%;
+    }
+    .ant-table-thead > tr > th:nth-child(5),
+    .ant-table-tbody > tr > td:nth-child(5) {
+      width: 17%;
+    }
+    .ant-table-thead > tr > th:nth-child(6),
+    .ant-table-tbody > tr > td:nth-child(6) {
+      width: 10%;
+    }
+    .ant-table-thead > tr > th:nth-child(7),
+    .ant-table-tbody > tr > td:nth-child(7) {
+      width: 10%;
+    }
+    .ant-table-thead > tr > th:nth-child(8),
+    .ant-table-tbody > tr > td:nth-child(8) {
+      width: 13%;
+    }
+    .ant-table-thead > tr > th:nth-child(9),
+    .ant-table-tbody > tr > td:nth-child(9) {
+      width: 10%;
+    }
+  }
+}
+
+.button{
+  .ml10;
+}
