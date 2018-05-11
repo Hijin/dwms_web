@@ -131,20 +131,10 @@ const menuData = [
       {
         name: '用户基础信息管理',
         path: 'basicInfoManagement',
-        children: [
-          {
-            name: '用户信息管理',
-            path: 'userInfoManagement',
-          },
-          {
-            name: '个人信息管理',
-            path: 'infoManagement',
-          },
-        ],
       },
       {
-        name: '角色管理',
-        path: 'roleManagement',
+        name: '权限设置',
+        path: 'permissionSet',
       },
     ],
   },

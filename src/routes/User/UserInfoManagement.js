@@ -2,12 +2,15 @@
  * Created by chennanjin on 2018/5/9.
  */
 import React, { Component } from 'react';
-import { Button, Input, Table, Pagination, Modal, Popover, Checkbox } from 'antd';
+import { Button, Input, Table, Pagination, Modal, Popover, Checkbox, Form, Select } from 'antd';
 import styles from './UserInfoManagement.less'
 
-const Search = Input.Search;
+const InputSearch = Input.Search;
 const CheckboxGroup = Checkbox.Group;
+const FormItem = Form.Item;
+const Option = Select.Option;
 
+@Form.create()
 export default class Application extends Component {
   state = {
     selectedRowKeys: [],
@@ -18,6 +21,8 @@ export default class Application extends Component {
     modifyModalShow: false,
     deleteModalShow: false,
     roleModalShow: false,
+    addModalShow: false,
+    addMemberLoading: false,
   };
 
   onSelectChange = (selectedRowKeys) => {
@@ -64,6 +69,13 @@ export default class Application extends Component {
     })
   }
 
+  changeAddModalShow = () => {
+    const preStatue = this.state.addModalShow
+    this.setState({
+      addModalShow: !preStatue,
+    })
+  }
+
 
   handleDeleteMember = () => {
 
@@ -74,11 +86,24 @@ export default class Application extends Component {
   handleRoleChange = () => {
   }
 
+  handleAddMember = () => {
+    this.props.form.validateFields((err, fieldsValue) => {
+      if (err) {
+        return;
+      }
+      const values = fieldsValue['邮箱']
+      console.log(values)
+    })
+  }
+
 
 
   render() {
     const { loading, selectedRowKeys, currentPagination, modifyBtnDisabled, delegateBtnDisabled  } = this.state;
-    const {modifyModalShow, deleteModalShow, roleModalShow} = this.state
+    const {modifyModalShow, addModalShow, deleteModalShow, roleModalShow} = this.state
+    const {addMemberLoading} = this.state
+    const { getFieldDecorator } = this.props.form;
+
     const Columns = [
       {
         title: '用户名',
@@ -129,7 +154,7 @@ export default class Application extends Component {
         Statue: '不可用',
         Type: ['普通成员','成员A'],
       }]
-    const plainOptions = ['角色A','角色B','角色C','角色D','角色E','角色F','角色H','角色J']
+    const plainOptions = ['角色A角色A角色A角色A','角色B','角色C','角色D','角色E','角色F','角色H','角色J']
 
     const rowSelection = {
       selectedRowKeys,
@@ -154,6 +179,93 @@ export default class Application extends Component {
       </Modal>
     )
 
+    const formItemLayout = {
+      labelCol: {
+        xs: { span: 24 },
+        sm: { span: 8 },
+      },
+      wrapperCol: {
+        xs: { span: 24 },
+        sm: { span: 16 },
+      },
+    };
+
+    const AddModal = (
+      <Modal
+        title="成员删除"
+        visible={addModalShow}
+        confirmLoading={addMemberLoading}
+        onOk={() => this.handleAddMember()}
+        onCancel={() => this.changeAddModalShow()}
+      >
+        <Form>
+          <FormItem
+            {...formItemLayout}
+            label="邮箱"
+          >
+            {getFieldDecorator('邮箱', {
+              rules: [{
+                type: 'email', message: '请输入正确的邮箱!',
+              }, {
+                required: true, message: '请输入你的邮箱!',
+              }],
+            })(
+              <Input />
+            )}
+          </FormItem>
+          <FormItem
+            {...formItemLayout}
+            label='用户名'
+          >
+            {getFieldDecorator('用户名', {
+            rules: [{ required: true, message: '请输入用户名!', whitespace: true }],
+          })(
+            <Input />
+          )}
+          </FormItem>
+          <FormItem
+            {...formItemLayout}
+            label='真实姓名'
+          >
+            {getFieldDecorator('真实姓名', {
+              rules: [{ required: true, message: '请输入真实姓名!', whitespace: true }],
+            })(
+              <Input />
+            )}
+          </FormItem>
+          <FormItem
+            {...formItemLayout}
+            label="手机号码"
+          >
+            {getFieldDecorator('手机号码', {
+              rules: [{ required: true, message: '请输入你的手机号!' }],
+            })(
+              <Input />
+            )}
+          </FormItem>
+          <FormItem
+            {...formItemLayout}
+            label="状态"
+          >
+            <Select defaultValue="enable">
+              <Option value="enable">可用</Option>
+              <Option value="disable">不可用</Option>
+            </Select>
+          </FormItem>
+          <FormItem
+            {...formItemLayout}
+            label="角色分配"
+          >
+            {getFieldDecorator('角色分配', {
+              rules: [{ required: true, message: '请分配角色!' }],
+            })(
+              <CheckboxGroup className={styles.checkbox} options={plainOptions} defaultValue={['角色B']} />
+            )}
+          </FormItem>
+        </Form>
+      </Modal>
+    )
+
     const DeleteModal = (
       <Modal
         title="成员删除"
@@ -174,19 +286,19 @@ export default class Application extends Component {
         onOk={() => this.handleRoleModify()}
         onCancel={() => this.changeRoleModalShow()}
       >
-        <CheckboxGroup options={plainOptions} defaultValue={['角色B']} onChange={this.handleRoleChange} />
+        <CheckboxGroup className={styles.checkbox}  options={plainOptions} defaultValue={['角色B']} onChange={this.handleRoleChange} />
       </Modal>
     )
 
     return (
       <div className={styles.main}>
-        <div className={styles.header}>
-          <Search
+        <div>
+          <InputSearch
             placeholder="请输入搜索字段"
             onSearch={value => console.log(value)}
             style={{ width: 200 }}
           />
-          <Button className={styles.button} icon='plus'>添加</Button>
+          <Button className={styles.button} icon='plus' onClick={this.changeAddModalShow}>添加</Button>
           <Button className={styles.button} icon='edit' disabled={modifyBtnDisabled} onClick={this.changeModifyModalShow}>修改</Button>
           <Button className={styles.button} icon='delete' disabled={delegateBtnDisabled} onClick={this.changeDeleteModalShow}>删除</Button>
         </div>
@@ -214,6 +326,7 @@ export default class Application extends Component {
         {ModifyModal}
         {DeleteModal}
         {RoleModal}
+        {AddModal}
       </div>
     )
   }
