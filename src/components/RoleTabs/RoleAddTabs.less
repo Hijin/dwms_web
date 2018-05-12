@@ -1,0 +1,90 @@
+@import "~antd/lib/style/themes/default.less";
+@import "../../utils/utils.less";
+
+.main {
+  .hFull;
+  border: 1px solid #efefef;
+  border-bottom-left-radius: 10px;
+  border-bottom-right-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  padding: 10px;
+}
+
+.form {
+  .wFull;
+  display: flex;
+  flex-wrap: wrap;
+  :global {
+    .ant-row {
+      display: flex;
+      div:last-child{
+        flex: 1;
+      }
+    }
+    .ant-row:first-child {
+      width: 40%;
+      padding-right: 15px;
+    }
+    .ant-row:last-child {
+      width: 60%;
+      padding-left: 15px;
+    }
+  }
+}
+
+.modal {
+  :global {
+    .ant-transfer {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+  }
+}
+
+.infoSet {
+  flex: 1;
+  display: flex;
+}
+
+.infoSetBlock {
+  display: flex;
+  width: 50%;
+  position: relative;
+  .infoArea {
+    margin-left: 5px;
+    padding-left: 5px;
+    flex: 1;
+    border: 1px solid #efefef;
+    border-radius: 5px;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    right: 0;
+    left: 70px;
+    overflow: scroll;
+  }
+}
+
+.infoSetBlock:first-child{
+  margin-right: 20px;
+}
+
+.tag {
+  .mt10;
+}
+
+.bottomArea {
+  border-top-left-radius: 10px;
+  border-top: 1px solid #efefef;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 60px;
+  margin-top: 10px;
+  margin-left: -10px;
+  margin-right: -10px;
+  border-top-right-radius: 10px;
+  box-shadow: 0 -4px 5px #ddd;
+}

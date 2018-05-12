@@ -3,7 +3,7 @@ import { isUrl } from '../utils/utils';
 const menuData = [
   {
     name: '业务管理',
-    icon: 'form',
+    icon: 'dashboard',
     path: 'businessManagement',
     children: [
       {
@@ -59,7 +59,7 @@ const menuData = [
 
   {
     name: ' 库存管理',
-    icon: '',
+    icon: 'database',
     path: 'stockManagement',
     children: [
       {
@@ -90,7 +90,7 @@ const menuData = [
   },
   {
     name: '基础信息管理',
-    icon: '',
+    icon: 'table',
     path: 'infoManagement',
     children: [
       {
@@ -124,16 +124,16 @@ const menuData = [
     ],
   },
   {
-    name: '用户管理',
-    icon: 'user',
+    name: '系统管理',
+    icon: 'setting',
     path: 'userManagement',
     children: [
       {
-        name: '用户基础信息管理',
+        name: '用户管理',
         path: 'basicInfoManagement',
       },
       {
-        name: '权限设置',
+        name: '角色管理',
         path: 'permissionSet',
       },
     ],

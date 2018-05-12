@@ -10,9 +10,46 @@
   padding: 10px;
 }
 
+.modal {
+  :global {
+    .ant-transfer {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+  }
+}
+
 .list {
   width: 50%;
   height: 100%;
+  border: 1px solid #efefef;
+  border-radius: 5px;
+  position: relative;
+}
+
+.listHeader {
+  color: rgba(0, 0, 0, 0.85);
+  font-weight: 500;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #f0f2f5;
+  height: 50px;
+}
+
+.listTable {
+  position: absolute;
+  top: 50px;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  overflow: scroll;
+  :global {
+    .ant-table-tbody > tr > td:last-child{
+      text-align: right;
+    }
+  }
 }
 
 .list:first-child {

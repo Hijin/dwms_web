@@ -32,14 +32,8 @@ const copyright = (
 );
 
 class UserLayout extends React.PureComponent {
-  getPageTitle() {
-    const { routerData, location } = this.props;
-    const { pathname } = location;
-    let title = 'Ant Design Pro';
-    if (routerData[pathname] && routerData[pathname].name) {
-      title = `${routerData[pathname].name} - Ant Design Pro`;
-    }
-    return title;
+  getPageTitle = () => {
+    return '数字化仓库管理系统';
   }
   render() {
     const { routerData, match } = this.props;

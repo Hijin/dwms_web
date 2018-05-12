@@ -4,6 +4,7 @@
 import React, { Component } from 'react';
 import { Tabs } from 'antd';
 import RoleTabs from '../../components/RoleTabs/RoleTabs';
+import RoleAddTabs from '../../components/RoleTabs/RoleAddTabs';
 import styles from './PermissionSetting.less'
 
 const TabPane = Tabs.TabPane;
@@ -26,6 +27,9 @@ export default class PermissionSetting extends Component {
                 <RoleTabs title={item} />
               </TabPane>)
           })}
+          <TabPane tab="+ 新建角色" key="-1">
+            <RoleAddTabs />
+          </TabPane>
         </Tabs>
       </div>
     )
