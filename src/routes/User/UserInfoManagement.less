@@ -4,10 +4,9 @@
 .main {
   .containerBody;
 }
-.checkbox {
+.radio {
   :global {
-    .ant-checkbox-group-item {
-      display: inline-block;
+    .ant-radio-wrapper {
       margin-top: 10px;
       margin-right: 0;
       width: 50%;
@@ -16,6 +15,33 @@
 }
 .pagination {
   .paginationAll;
+}
+
+.addMemberForm {
+  display: flex;
+  flex-wrap: wrap;
+  :global {
+    .ant-row {
+      width: 50%;
+      padding: 0 30px;
+      display: flex;
+    }
+    .ant-row:last-child{
+      width: 100%;
+    }
+    .ant-form-item-label {
+      text-align: left;
+    }
+    .ant-col-sm-8 {
+      width: 90px;
+    }
+    .ant-col-sm-16 {
+      flex: 1;
+    }
+    .ant-radio-wrapper {
+      width: 25%;
+    }
+  }
 }
 
 .tableContainer {

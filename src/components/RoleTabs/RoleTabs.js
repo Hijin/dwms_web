@@ -10,6 +10,7 @@ export default class RoleTabs extends Component {
   render() {
     const member = ['用户1', '用户2', '用户3'];
     const permission = ['收货单', '领料申请', '借还管理'];
+
     return (
       <div className={styles.main}>
         <div>

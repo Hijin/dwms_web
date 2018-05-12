@@ -2,11 +2,11 @@
  * Created by chennanjin on 2018/5/9.
  */
 import React, { Component } from 'react';
-import { Button, Input, Table, Pagination, Modal, Popover, Checkbox, Form, Select } from 'antd';
+import { Button, Input, Table, Pagination, Modal, Popover, Radio, Form, Select } from 'antd';
 import styles from './UserInfoManagement.less'
 
 const InputSearch = Input.Search;
-const CheckboxGroup = Checkbox.Group;
+const RadioGroup = Radio.Group;
 const FormItem = Form.Item;
 const Option = Select.Option;
 
@@ -154,7 +154,7 @@ export default class Application extends Component {
         Statue: '不可用',
         Type: ['普通成员','成员A'],
       }]
-    const plainOptions = ['角色A角色A角色A角色A','角色B','角色C','角色D','角色E','角色F','角色H','角色J']
+    const plainOptions = ['角色A','角色B','角色C','角色D','角色E','角色F','角色H','角色J']
 
     const rowSelection = {
       selectedRowKeys,
@@ -192,18 +192,19 @@ export default class Application extends Component {
 
     const AddModal = (
       <Modal
-        title="成员删除"
+        width='70%'
+        title="成员添加"
         visible={addModalShow}
         confirmLoading={addMemberLoading}
         onOk={() => this.handleAddMember()}
         onCancel={() => this.changeAddModalShow()}
       >
-        <Form>
+        <Form className={styles.addMemberForm}>
           <FormItem
             {...formItemLayout}
-            label="邮箱"
+            label="邮 箱"
           >
-            {getFieldDecorator('邮箱', {
+            {getFieldDecorator('邮 箱', {
               rules: [{
                 type: 'email', message: '请输入正确的邮箱!',
               }, {
@@ -215,9 +216,9 @@ export default class Application extends Component {
           </FormItem>
           <FormItem
             {...formItemLayout}
-            label='用户名'
+            label='用 户 名'
           >
-            {getFieldDecorator('用户名', {
+            {getFieldDecorator('用 户 名', {
             rules: [{ required: true, message: '请输入用户名!', whitespace: true }],
           })(
             <Input />
@@ -245,11 +246,20 @@ export default class Application extends Component {
           </FormItem>
           <FormItem
             {...formItemLayout}
-            label="状态"
+            label="状 态"
           >
             <Select defaultValue="enable">
               <Option value="enable">可用</Option>
               <Option value="disable">不可用</Option>
+            </Select>
+          </FormItem>
+          <FormItem
+            {...formItemLayout}
+            label="性 别"
+          >
+            <Select defaultValue="male">
+              <Option value="male">男</Option>
+              <Option value="female">女</Option>
             </Select>
           </FormItem>
           <FormItem
@@ -259,7 +269,7 @@ export default class Application extends Component {
             {getFieldDecorator('角色分配', {
               rules: [{ required: true, message: '请分配角色!' }],
             })(
-              <CheckboxGroup className={styles.checkbox} options={plainOptions} defaultValue={['角色B']} />
+              <RadioGroup className={styles.radio} options={plainOptions} defaultValue={['角色B']} />
             )}
           </FormItem>
         </Form>
@@ -286,7 +296,7 @@ export default class Application extends Component {
         onOk={() => this.handleRoleModify()}
         onCancel={() => this.changeRoleModalShow()}
       >
-        <CheckboxGroup className={styles.checkbox}  options={plainOptions} defaultValue={['角色B']} onChange={this.handleRoleChange} />
+        <RadioGroup className={styles.radio} options={plainOptions} defaultValue={['角色B']} onChange={this.handleRoleChange} />
       </Modal>
     )
 

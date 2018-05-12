@@ -1,4 +1,6 @@
 import { routerRedux } from 'dva/router';
+import { message } from "antd";
+import MD5 from 'md5';
 import { fakeAccountLogin } from '../services/api';
 import { setAuthority } from '../utils/authority';
 import { reloadAuthorized } from '../utils/Authorized';
@@ -6,21 +8,25 @@ import { reloadAuthorized } from '../utils/Authorized';
 export default {
   namespace: 'login',
 
-  state: {
-    status: undefined,
-  },
+  state: {},
 
   effects: {
     *login({ payload }, { call, put }) {
-      const response = yield call(fakeAccountLogin, payload);
+      const response = yield call(fakeAccountLogin, {...payload, password: MD5(payload.password)});
+      console.log('====>',response)
       yield put({
         type: 'changeLoginStatus',
         payload: response,
       });
       // Login successfully
-      if (response.status === 'ok') {
+      if (response.code === '0000') {
         reloadAuthorized();
         yield put(routerRedux.push('/'));
+      } else if (response.code === '0001'){
+        message.error( response.msg)
+      }
+      else {
+        message.error( response.msg)
       }
     },
     *logout(_, { put, select }) {
@@ -47,10 +53,9 @@ export default {
 
   reducers: {
     changeLoginStatus(state, { payload }) {
-      setAuthority(payload.currentAuthority);
+      setAuthority('admin');
       return {
         ...state,
-        status: payload.status,
         type: payload.type,
       };
     },
