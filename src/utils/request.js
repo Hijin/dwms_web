@@ -4,9 +4,9 @@ import { routerRedux } from 'dva/router';
 import store from '../index';
 
 // 阿里云地址
-// const baseURL = 'http://47.98.251.95:8080';
+ const baseURL = 'http://47.98.251.95:8080';
 // 阿稳地址
- const baseURL = 'http://192.168.1.11:8080';
+// const baseURL = 'http://192.168.1.11:8080';
 
 const codeMessage = {
   200: '服务器成功返回请求的数据。',

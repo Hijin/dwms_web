@@ -2,8 +2,9 @@
  * Created by chennanjin on 2018/5/9.
  */
 import React, { Component } from 'react';
-import { Button, Input, Table, Pagination, Modal, Popover, Radio, Form, Select, Spin, message} from 'antd';
+import { Button, Input, Table, Pagination, Modal, Popover, Radio, Form, Select, Spin} from 'antd';
 import { connect } from 'dva';
+import _ from 'lodash';
 import styles from './UserInfoManagement.less'
 
 const InputSearch = Input.Search;
@@ -39,11 +40,29 @@ export default class UserInfoManagement extends Component {
     });
   }
 
-  onSelectChange = (selectedRowKeys) => {
-    console.log('selectedRowKeys changed: ', selectedRowKeys);
-    // this.getSelectedItems(selectedRowKeys);
+  onSelectChange = (selectedRowKeys, selectedItems) => {
+    const allItems = selectedItems.concat(this.state.selectedItems)
+    // 数组去重
+    const uniqItems = []
+    for (let i = 0 ; i < allItems.length ; i++) {
+      let has = false;
+      for (let j = 0 ; j < uniqItems.length ; j++) {
+        if (allItems[i].id === uniqItems[j].id) {
+          has = true
+          break
+        }
+      }
+      if (!has) {
+        uniqItems.push(allItems[i])
+      }
+    }
+    const newSelectedItems = _.filter(uniqItems, item => {
+      return selectedRowKeys.indexOf(item.id) >= 0
+    })
+
     this.setState({
       selectedRowKeys,
+      selectedItems: newSelectedItems,
       modifyBtnDisabled: selectedRowKeys.length !== 1,
       delegateBtnDisabled: selectedRowKeys.length === 0,
     });
@@ -103,7 +122,7 @@ export default class UserInfoManagement extends Component {
     })
 
     if (!isAdd) {
-      const selectedItem = this.getSelectedItem(this.state.selectedRowKeys[0]);
+      const selectedItem = this.state.selectedItems[0];
 
       this.props.form.setFieldsValue({
         username: selectedItem.username,
@@ -117,67 +136,19 @@ export default class UserInfoManagement extends Component {
     }
   }
 
-  getSelectedItem = (selectedID) => {
-    console.log('id===>',selectedID)
-    let selectedItem = null;
-    for (let index = 0; index < this.props.userInfoManager.list.length; index++) {
-      const item = this.props.userInfoManager.list[index]
-      if (item.id === selectedID) {
-        selectedItem = item;
-        break;
-      }
-    }
-    return selectedItem
-  }
-
-  getSelectedItems = (selectedKeys) => {
-    const preSelectedItems = this.state.selectedItems;
-    const newSelectedItems = this.state.selectedItems;
-    for (let i = 0; i < selectedKeys.length; i++) {
-      const key = selectedKeys[i]
-      let hasItem = false
-      for (let index = 0; index < preSelectedItems.length; index++) {
-        const item = preSelectedItems[index]
-        if (item.id === key) {
-          hasItem = true
-          break
-        }
-      }
-      if (!hasItem) {
-        newSelectedItems.push(this.props.userInfoManager.list.filter(item => {
-          return item.id === key
-        }))
-      }
-    }
-/*
-    for (let i = 0; i < preSelectedItems.length; i++){
-      const item = preSelectedItems[i]
-      let hasItem = false
-      for (let index = 0; index < selectedKeys.length; index++) {
-        if (item.id === selectedKeys[index]) {
-          hasItem = true
-          break
-        }
-      }
-      if (!hasItem){
-        newSelectedItems.splice(i, 1)
-      }
-    }
-    */
-    console.log('===>new', newSelectedItems)
-    this.setState({
-      selectedItems: newSelectedItems,
-    })
-  }
-
   handleDeleteMember = () => {
-    const selectedItem = this.getSelectedItem(this.state.selectedRowKeys[0]);
+    const params = [];
+    params.push(
+      this.state.selectedItems.map(item => {
+       return {id: item.id}
+      })
+    )
 
     this.props.dispatch({
       type: 'userInfoManager/deleteMember',
       payload: {
-        params: [{id: selectedItem.id}],
-        successCallBack: this.changeDeleteModalShow
+        params: params,
+        successCallBack: this.changeDeleteModalShow,
       },
     })
   }
@@ -204,7 +175,7 @@ export default class UserInfoManagement extends Component {
         roleId: fieldsValue['role'],
       }
       if (!this.state.isAddMember) {
-        const selectedItem = this.getSelectedItem(this.state.selectedRowKeys[0])
+        const selectedItem = this.state.selectedItems[0]
         param.id = selectedItem.id
       }
       this.props.dispatch({
@@ -243,7 +214,7 @@ export default class UserInfoManagement extends Component {
 
 
   render() {
-    const { selectedRowKeys, pageIndex, modifyBtnDisabled, delegateBtnDisabled, pageSize  } = this.state;
+    const { selectedRowKeys, selectedItems, pageIndex, modifyBtnDisabled, delegateBtnDisabled, pageSize  } = this.state;
     const {modifyMemberModalShow, isAddMember, deleteModalShow, roleModalShow} = this.state
     const { getFieldDecorator } = this.props.form;
     const { list, roles, totalData } = this.props.userInfoManager;
@@ -406,10 +377,10 @@ export default class UserInfoManagement extends Component {
         onOk={() => this.handleDeleteMember()}
         onCancel={() => this.changeDeleteModalShow()}
       >
-        {selectedRowKeys.map(id => {
+        {selectedItems.map(item => {
           return (
             <div>
-              {this.getSelectedItem(id).username}
+              {item.username}
             </div>
           )
         })}
