@@ -2,7 +2,8 @@
  * Created by chennanjin on 2018/5/9.
  */
 import React, { Component } from 'react';
-import { Button, Input, Table, Pagination, Modal, Popover, Radio, Form, Select } from 'antd';
+import { Button, Input, Table, Pagination, Modal, Popover, Radio, Form, Select, Spin, message} from 'antd';
+import { connect } from 'dva';
 import styles from './UserInfoManagement.less'
 
 const InputSearch = Input.Search;
@@ -10,23 +11,37 @@ const RadioGroup = Radio.Group;
 const FormItem = Form.Item;
 const Option = Select.Option;
 
+@connect(({userInfoManager}) => ({
+  userInfoManager,
+  }),
+)
 @Form.create()
-export default class Application extends Component {
+export default class UserInfoManagement extends Component {
   state = {
     selectedRowKeys: [],
-    loading: false,
-    currentPagination: 1,
     modifyBtnDisabled: true,
     delegateBtnDisabled: true,
-    modifyModalShow: false,
-    deleteModalShow: false,
     roleModalShow: false,
-    addModalShow: false,
-    addMemberLoading: false,
+    modifyMemberModalShow: false,
+    selectedItems: [],
+    isAddMember: false,
+    pageIndex: 1,
+    pageSize: 10,
   };
+
+  componentDidMount() {
+    this.props.dispatch({
+      type: 'userInfoManager/getInfoList',
+      payload: {
+        pageSize: this.state.pageSize,
+        pageNo: this.state.pageIndex,
+      },
+    });
+  }
 
   onSelectChange = (selectedRowKeys) => {
     console.log('selectedRowKeys changed: ', selectedRowKeys);
+    // this.getSelectedItems(selectedRowKeys);
     this.setState({
       selectedRowKeys,
       modifyBtnDisabled: selectedRowKeys.length !== 1,
@@ -36,7 +51,14 @@ export default class Application extends Component {
 
   onPaginationChange = (page) => {
     this.setState({
-      currentPagination: page,
+      pageIndex: page,
+    });
+    this.props.dispatch({
+      type: 'userInfoManager/getInfoList',
+      payload: {
+        pageSize: this.state.pageSize,
+        pageNo: page,
+      },
     });
   }
 
@@ -46,13 +68,6 @@ export default class Application extends Component {
 
   changePermission = (item) => {
     console.log(item)
-  }
-
-  changeModifyModalShow = () => {
-    const preStatue = this.state.modifyModalShow
-    this.setState({
-      modifyModalShow: !preStatue,
-    })
   }
 
   changeDeleteModalShow = () => {
@@ -69,115 +84,211 @@ export default class Application extends Component {
     })
   }
 
-  changeAddModalShow = () => {
-    const preStatue = this.state.addModalShow
+  dismissModifyMemberModal = () => {
     this.setState({
-      addModalShow: !preStatue,
+      modifyMemberModalShow: false,
+    })
+  }
+  showModifyMemberModal = (isAdd) => {
+    this.setState({
+      modifyMemberModalShow: true,
+      isAddMember: isAdd,
+    })
+
+    this.props.dispatch({
+      type: 'userInfoManager/queryRole',
+      payload: {
+        errorCallBack: this.dismissModifyMemberModal,
+      },
+    })
+
+    if (!isAdd) {
+      const selectedItem = this.getSelectedItem(this.state.selectedRowKeys[0]);
+
+      this.props.form.setFieldsValue({
+        username: selectedItem.username,
+        realName: selectedItem.realName,
+        sex: selectedItem.sex === 1? 'male':'female',
+        status: selectedItem.status === 1? 'enable':'disable',
+        tel: selectedItem.tel,
+        email: selectedItem.email,
+        role: selectedItem.sysRole.id,
+      })
+    }
+  }
+
+  getSelectedItem = (selectedID) => {
+    console.log('id===>',selectedID)
+    let selectedItem = null;
+    for (let index = 0; index < this.props.userInfoManager.list.length; index++) {
+      const item = this.props.userInfoManager.list[index]
+      if (item.id === selectedID) {
+        selectedItem = item;
+        break;
+      }
+    }
+    return selectedItem
+  }
+
+  getSelectedItems = (selectedKeys) => {
+    const preSelectedItems = this.state.selectedItems;
+    const newSelectedItems = this.state.selectedItems;
+    for (let i = 0; i < selectedKeys.length; i++) {
+      const key = selectedKeys[i]
+      let hasItem = false
+      for (let index = 0; index < preSelectedItems.length; index++) {
+        const item = preSelectedItems[index]
+        if (item.id === key) {
+          hasItem = true
+          break
+        }
+      }
+      if (!hasItem) {
+        newSelectedItems.push(this.props.userInfoManager.list.filter(item => {
+          return item.id === key
+        }))
+      }
+    }
+/*
+    for (let i = 0; i < preSelectedItems.length; i++){
+      const item = preSelectedItems[i]
+      let hasItem = false
+      for (let index = 0; index < selectedKeys.length; index++) {
+        if (item.id === selectedKeys[index]) {
+          hasItem = true
+          break
+        }
+      }
+      if (!hasItem){
+        newSelectedItems.splice(i, 1)
+      }
+    }
+    */
+    console.log('===>new', newSelectedItems)
+    this.setState({
+      selectedItems: newSelectedItems,
     })
   }
 
-
   handleDeleteMember = () => {
+    const selectedItem = this.getSelectedItem(this.state.selectedRowKeys[0]);
 
+    this.props.dispatch({
+      type: 'userInfoManager/deleteMember',
+      payload: {
+        params: [{id: selectedItem.id}],
+        successCallBack: this.changeDeleteModalShow
+      },
+    })
   }
 
   handleRoleModify = () => {
   }
-  handleRoleChange = () => {
+  handleRoleChange = (e) => {
   }
 
-  handleAddMember = () => {
+  // 添加或修改成员
+  handleModifyMember = () => {
     this.props.form.validateFields((err, fieldsValue) => {
       if (err) {
         return;
       }
-      const values = fieldsValue['邮箱']
-      console.log(values)
+
+      const param = {
+        username: fieldsValue['username'],
+        realName: fieldsValue['realName'],
+        sex: fieldsValue['sex'] === 'male'?'1':'0',
+        status: fieldsValue['status'] === 'enable'?'1':'0',
+        tel: fieldsValue['tel'],
+        email: fieldsValue['email'],
+        roleId: fieldsValue['role'],
+      }
+      if (!this.state.isAddMember) {
+        const selectedItem = this.getSelectedItem(this.state.selectedRowKeys[0])
+        param.id = selectedItem.id
+      }
+      this.props.dispatch({
+        type: 'userInfoManager/modifyMember',
+        payload: {
+          params: param,
+          successCallBack: this.modifyMemberSuccess,
+        },
+      })
     })
   }
 
+  modifyMemberSuccess = () => {
+    this.dismissModifyMemberModal();
+    this.setState({
+      pageIndex: 1,
+    })
+    this.props.dispatch({
+      type: 'userInfoManager/getInfoList',
+      payload: {
+        pageSize: this.state.pageSize,
+        pageNo: 1,
+      },
+    });
+  }
+
+  renderRoleSelected = (roles) => {
+    return (
+      <RadioGroup className={styles.radio}>
+        {roles.map(item => {
+          return <Radio value={item.id} key={item.id}>{item.name}</Radio>
+        })}
+      </RadioGroup>
+    )
+  }
 
 
   render() {
-    const { loading, selectedRowKeys, currentPagination, modifyBtnDisabled, delegateBtnDisabled  } = this.state;
-    const {modifyModalShow, addModalShow, deleteModalShow, roleModalShow} = this.state
-    const {addMemberLoading} = this.state
+    const { selectedRowKeys, pageIndex, modifyBtnDisabled, delegateBtnDisabled, pageSize  } = this.state;
+    const {modifyMemberModalShow, isAddMember, deleteModalShow, roleModalShow} = this.state
     const { getFieldDecorator } = this.props.form;
+    const { list, roles, totalData } = this.props.userInfoManager;
+    const { pageLoading, modifyMemberLoading, rolesLoading } = this.props.userInfoManager;
 
     const Columns = [
       {
         title: '用户名',
-        dataIndex: 'Name',
+        dataIndex: 'username',
       },
       {
         title: '姓名',
-        dataIndex: 'RealName',
+        dataIndex: 'realName',
       },
       {
         title: '性别',
-        dataIndex: 'Sex',
+        dataIndex: 'sex',
+        render: sex => <div>{sex === 1 ? '男':'女'}</div>,
       },
       {
         title: '邮箱',
-        dataIndex: 'Email',
+        dataIndex: 'email',
+        render: email => <div>{email ? email:'-'}</div>,
       },
       {
         title: '电话号码',
-        dataIndex: 'Tel',
+        dataIndex: 'tel',
+        render: tel => <div>{tel ? tel:'-'}</div>,
       },
       {
         title: '状态',
-        dataIndex: 'Statue',
+        dataIndex: 'status',
+        render: status => <div>{status === 1 ? '可用':'不可用'}</div>,
       },
       {
         title: '角色类型',
-        render: item => <div><Popover content={item.Type} trigger="hover"><a style={{marginRight: '10px'}}>查看</a></Popover><a onClick={this.changeRoleModalShow}>分配</a></div>,
+        render: item => <div><Popover content={item.sysRole.name} trigger="hover"><a style={{marginRight: '10px'}}>查看</a></Popover><a onClick={this.changeRoleModalShow}>分配</a></div>,
       }]
 
-    const data = [
-      {
-        Name: 'J',
-        RealName: '陈南进',
-        Sex: '男',
-        Email: '1553877174@qq.com',
-        Tel: '18321436547',
-        Statue: '可用',
-        Type: '超级管理',
-      },
-      {
-        ID: '002',
-        Name: 'K',
-        RealName: '城市文',
-        Sex: '女',
-        Email: 'jleechen90@gmail.com',
-        Tel: '18321436547',
-        Statue: '不可用',
-        Type: ['普通成员','成员A'],
-      }]
     const plainOptions = ['角色A','角色B','角色C','角色D','角色E','角色F','角色H','角色J']
 
     const rowSelection = {
       selectedRowKeys,
       onChange: this.onSelectChange,
     };
-
-    const ModifyModal = (
-      <Modal
-        title="修改信息"
-        visible={modifyModalShow}
-        onOk={() => this.confirmInfo()}
-        onCancel={() => this.changeModifyModalShow()}
-      >
-        <div>
-          <span>邮箱</span>
-          <Input />
-        </div>
-        <div>
-          <span>电话</span>
-          <Input />
-        </div>
-      </Modal>
-    )
 
     const formItemLayout = {
       labelCol: {
@@ -190,89 +301,101 @@ export default class Application extends Component {
       },
     };
 
-    const AddModal = (
+    const ModifyModal = (
       <Modal
         width='70%'
-        title="成员添加"
-        visible={addModalShow}
-        confirmLoading={addMemberLoading}
-        onOk={() => this.handleAddMember()}
-        onCancel={() => this.changeAddModalShow()}
+        title={isAddMember?'成员添加':'成员修改'}
+        visible={modifyMemberModalShow}
+        confirmLoading={modifyMemberLoading}
+        onOk={() => this.handleModifyMember()}
+        onCancel={() => this.dismissModifyMemberModal()}
       >
-        <Form className={styles.addMemberForm}>
-          <FormItem
-            {...formItemLayout}
-            label="邮 箱"
-          >
-            {getFieldDecorator('邮 箱', {
-              rules: [{
-                type: 'email', message: '请输入正确的邮箱!',
-              }, {
-                required: true, message: '请输入你的邮箱!',
-              }],
-            })(
-              <Input />
-            )}
-          </FormItem>
-          <FormItem
-            {...formItemLayout}
-            label='用 户 名'
-          >
-            {getFieldDecorator('用 户 名', {
-            rules: [{ required: true, message: '请输入用户名!', whitespace: true }],
-          })(
-            <Input />
-          )}
-          </FormItem>
-          <FormItem
-            {...formItemLayout}
-            label='真实姓名'
-          >
-            {getFieldDecorator('真实姓名', {
-              rules: [{ required: true, message: '请输入真实姓名!', whitespace: true }],
-            })(
-              <Input />
-            )}
-          </FormItem>
-          <FormItem
-            {...formItemLayout}
-            label="手机号码"
-          >
-            {getFieldDecorator('手机号码', {
-              rules: [{ required: true, message: '请输入你的手机号!' }],
-            })(
-              <Input />
-            )}
-          </FormItem>
-          <FormItem
-            {...formItemLayout}
-            label="状 态"
-          >
-            <Select defaultValue="enable">
-              <Option value="enable">可用</Option>
-              <Option value="disable">不可用</Option>
-            </Select>
-          </FormItem>
-          <FormItem
-            {...formItemLayout}
-            label="性 别"
-          >
-            <Select defaultValue="male">
-              <Option value="male">男</Option>
-              <Option value="female">女</Option>
-            </Select>
-          </FormItem>
-          <FormItem
-            {...formItemLayout}
-            label="角色分配"
-          >
-            {getFieldDecorator('角色分配', {
-              rules: [{ required: true, message: '请分配角色!' }],
-            })(
-              <RadioGroup className={styles.radio} options={plainOptions} defaultValue={['角色B']} />
-            )}
-          </FormItem>
-        </Form>
+        <Spin spinning={rolesLoading}>
+          <Form className={styles.addMemberForm}>
+            <FormItem
+              {...formItemLayout}
+              label='用 户 名'
+            >
+              {getFieldDecorator('username', {
+                rules: [{ required: true, message: '请输入用户名!', whitespace: true }],
+              })(
+                <Input />
+              )}
+            </FormItem>
+            <FormItem
+              {...formItemLayout}
+              label='真实姓名'
+            >
+              {getFieldDecorator('realName', {
+                rules: [{ required: true, message: '请输入真实姓名!', whitespace: true }],
+              })(
+                <Input />
+              )}
+            </FormItem>
+            <FormItem
+              {...formItemLayout}
+              label="手机号码"
+            >
+              {getFieldDecorator('tel', {
+                rules: [{ required: false, message: '请输入你的手机号!' }],
+              })(
+                <Input />
+              )}
+            </FormItem>
+            <FormItem
+              {...formItemLayout}
+              label="邮 箱"
+            >
+              {getFieldDecorator('email', {
+                rules: [{
+                  type: 'email', message: '请输入正确的邮箱!',
+                }, {
+                  required: false, message: '请输入你的邮箱!',
+                }],
+              })(
+                <Input />
+              )}
+            </FormItem>
+            <FormItem
+              {...formItemLayout}
+              label="状 态"
+            >
+              {getFieldDecorator('status', {
+                initialValue: 'enable',
+                rules: [{ required: false, message: '请分配角色!' }],
+              })(
+                <Select initialValue="enable">
+                  <Option value="enable" >可用</Option>
+                  <Option value="disable" >不可用</Option>
+                </Select>
+              )}
+            </FormItem>
+            <FormItem
+              {...formItemLayout}
+              label="性 别"
+            >
+              {getFieldDecorator('sex', {
+                initialValue: 'male',
+                rules: [{ required: false, message: '请分配角色!' }],
+              })(
+                <Select>
+                  <Option value="male">男</Option>
+                  <Option value="female">女</Option>
+                </Select>
+              )}
+            </FormItem>
+            <FormItem
+              {...formItemLayout}
+              label="角色分配"
+            >
+              {getFieldDecorator('role', {
+                rules: [{ required: true, message: '请分配角色!' }],
+              })(
+                this.renderRoleSelected(roles)
+              )}
+            </FormItem>
+          </Form>
+        </Spin>
       </Modal>
     )
 
@@ -283,8 +406,12 @@ export default class Application extends Component {
         onOk={() => this.handleDeleteMember()}
         onCancel={() => this.changeDeleteModalShow()}
       >
-        {selectedRowKeys.map(index => {
-          return <div>{data[index].Name}</div>
+        {selectedRowKeys.map(id => {
+          return (
+            <div>
+              {this.getSelectedItem(id).username}
+            </div>
+          )
         })}
       </Modal>
     )
@@ -308,8 +435,8 @@ export default class Application extends Component {
             onSearch={value => console.log(value)}
             style={{ width: 200 }}
           />
-          <Button className={styles.button} icon='plus' onClick={this.changeAddModalShow}>添加</Button>
-          <Button className={styles.button} icon='edit' disabled={modifyBtnDisabled} onClick={this.changeModifyModalShow}>修改</Button>
+          <Button className={styles.button} icon='plus' onClick={() => this.showModifyMemberModal(true)}>添加</Button>
+          <Button className={styles.button} icon='edit' disabled={modifyBtnDisabled} onClick={() => this.showModifyMemberModal(false)}>修改</Button>
           <Button className={styles.button} icon='delete' disabled={delegateBtnDisabled} onClick={this.changeDeleteModalShow}>删除</Button>
         </div>
 
@@ -317,26 +444,26 @@ export default class Application extends Component {
           <Table
             className={styles.table}
             columns={Columns}
-            dataSource={data}
-            loading={loading}
+            dataSource={list}
+            loading={pageLoading}
             pagination={false}
             rowSelection={rowSelection}
+            rowKey='id'
             scroll={{y: 300}}
           />
         </div>
 
         <Pagination
           className={styles.pagination}
-          total={data.length}
-          showTotal={(total)=> `当前第${currentPagination}页，总共 ${Math.ceil(total/5)} 页`}
-          pageSize={5}
-          current={currentPagination}
+          total={totalData}
+          showTotal={(total)=> `当前第${pageIndex}页，总共 ${Math.ceil(total/pageSize)} 页`}
+          pageSize={pageSize}
+          current={pageIndex}
           onChange={this.onPaginationChange}
         />
         {ModifyModal}
         {DeleteModal}
         {RoleModal}
-        {AddModal}
       </div>
     )
   }

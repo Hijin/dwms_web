@@ -77,3 +77,37 @@ export async function fakeRegister(params) {
 export async function queryNotices() {
   return request('/api/notices');
 }
+
+// 获取用户信息列表
+export async function getInfoList(params) {
+  return request('/api/sys/users/page', {
+    method: 'POST',
+    body: params,
+  });
+}
+// 添加用户
+export async function addMember(params) {
+  return request('/api/sys/users', {
+    method: 'POST',
+    body: params,
+  });
+}
+// 用户修改
+export async function modifyMember(params) {
+  return request(`/api/sys/users/${params.id}`, {
+    method: 'PUT',
+    body: params,
+  });
+}
+// 用户删除
+export async function deleteMember(params) {
+  console.log('------>',params)
+  return request(`/api/sys/users/batch`, {
+    method: 'DELETE',
+    body: params,
+  })
+}
+// 角色查询
+export async function queryRole() {
+  return request('/api/sys/roles');
+}

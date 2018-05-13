@@ -216,8 +216,8 @@ export default class SiderMenu extends PureComponent {
           <Link to="/">
             <img src={logo} alt="logo" />
             <div>
-              <span>数 字 化 仓 库</span>
-              <span>管 理 系 统</span>
+              <span style={{marginTop: '5px'}}>数 字 化 仓 库</span>
+              <span style={{marginTop: '-6px'}}>管 理 系 统</span>
             </div>
           </Link>
         </div>
