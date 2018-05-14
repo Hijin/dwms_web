@@ -6,6 +6,6 @@ import React, { Component } from 'react';
 export default class Application extends Component {
 
   render() {
-    return <div> 基础信息管理-物料信息wu</div>
+    return <div> 基础信息管理-物料信息wufdsafsd</div>
   }
 }
