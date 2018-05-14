@@ -135,11 +135,12 @@ export default {
         type: 'pageLoading',
         payload: false,
       })
+      console.log(res)
       if (res.code === '0000') {
-        yield put({
-          type: 'initPageList',
-          payload: res.data,
-        })
+        // yield put({
+        //   type: 'initPageList',
+        //   payload: res.data,
+        // })
       } else {
         message.error(res.msg)
       }

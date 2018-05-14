@@ -119,7 +119,7 @@ export async function roleChange(params) {
 }
 // 查找用户
 export async function searchUser(params) {
-  return request('', {
+  return request('/api/sys/users/fuzzySearch', {
     method: 'POST',
     body: params,
   })

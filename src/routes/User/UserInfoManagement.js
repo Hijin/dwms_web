@@ -230,7 +230,12 @@ export default class UserInfoManagement extends Component {
   }
 
   handleSearch = (value) => {
-
+    this.props.dispatch({
+      type: 'userInfoManager/searchUsers',
+      payload:{
+        keyword: value,
+      },
+    })
   }
 
   renderRoleSelected = (roles) => {
