@@ -2,15 +2,14 @@
  * Created by chennanjin on 2018/5/13.
  */
 import { message } from 'antd';
-import { getInfoList, addMember, queryRole, modifyMember, deleteMember} from '../services/api';
+import { getInfoList, addMember, queryRole, modifyMember, deleteMember, roleChange} from '../services/api';
 
 export default {
   namespace: 'userInfoManager',
 
   state: {
     pageLoading: false,
-    modifyMemberLoading: false,
-    deleteMemberLoading: false,
+    modalConfirmLoading: false,
     rolesLoading: false,
     list: [],
     roles: [],
@@ -39,7 +38,7 @@ export default {
     },
     *modifyMember({ payload }, { call, put}) {
       yield put({
-        type: 'changeModifyLoadingState',
+        type: 'changeModalConfirmLoadingState',
         payload: true,
       })
       let response = null;
@@ -51,7 +50,7 @@ export default {
       }
 
       yield put({
-        type: 'changeModifyLoadingState',
+        type: 'changeModalConfirmLoadingState',
         payload: false,
       })
       if (response.code === '0000') {
@@ -63,18 +62,34 @@ export default {
     },
     *deleteMember ({ payload }, { call, put}) {
       yield put({
-        type: 'changeDeleteLoadingState',
+        type: 'changeModalConfirmLoadingState',
         payload: true,
       })
 
       const response = yield call(deleteMember, payload.params)
       yield put({
-        type: 'changeDeleteLoadingState',
+        type: 'changeModalConfirmLoadingState',
         payload: false,
       })
-
       if (response.code === '0000') {
-        message.success(`成员${payload.params.username}已删除！`)
+        message.success(`成员已删除！`)
+        yield call(payload.successCallBack)
+      } else {
+        message.error(response.msg)
+      }
+    },
+    *changeRoles({ payload }, { call, put}) {
+      yield put({
+        type: 'changeModalConfirmLoadingState',
+        payload: true,
+      })
+      const response = yield call(roleChange, payload.params)
+      yield put({
+        type: 'changeModalConfirmLoadingState',
+        payload: false,
+      })
+      if (response.code === '0000') {
+        message.success('权限已变更')
         yield call(payload.successCallBack)
       } else {
         message.error(response.msg)
@@ -119,16 +134,10 @@ export default {
         pageLoading: payload,
       }
     },
-    changeModifyLoadingState (state, { payload }) {
+    changeModalConfirmLoadingState (state, { payload }) {
       return {
         ...state,
-        modifyMemberLoading: payload,
-      }
-    },
-    changeDeleteLoadingState (state, { payload }) {
-      return {
-        ...state,
-        deleteMemberLoading: payload,
+        modalConfirmLoading: payload,
       }
     },
     changeRoleLoadingState(state, { payload }) {

@@ -20,11 +20,13 @@ const Option = Select.Option;
 export default class UserInfoManagement extends Component {
   state = {
     selectedRowKeys: [],
+    selectedItems: [],
     modifyBtnDisabled: true,
     delegateBtnDisabled: true,
     roleModalShow: false,
     modifyMemberModalShow: false,
-    selectedItems: [],
+    deleteModalShow: false,
+    roleChangeItem: null,
     isAddMember: false,
     pageIndex: 1,
     pageSize: 10,
@@ -81,33 +83,39 @@ export default class UserInfoManagement extends Component {
     });
   }
 
-  confirmInfo = () => {
-
-  }
-
-  changePermission = (item) => {
-    console.log(item)
-  }
-
-  changeDeleteModalShow = () => {
-    const preStatue = this.state.deleteModalShow
+  deleteModalShow = () => {
     this.setState({
-      deleteModalShow: !preStatue,
+      deleteModalShow: true,
     })
   }
 
-  changeRoleModalShow = () => {
-    const preStatue = this.state.roleModalShow
+  roleModalShow = (roleChangeItem) => {
     this.setState({
-      roleModalShow: !preStatue,
+      roleModalShow: true ,
+    });
+    this.props.dispatch({
+      type: 'userInfoManager/queryRole',
+      payload: {
+        errorCallBack: this.dismissModal,
+      },
+    })
+    this.setState({roleChangeItem})
+    this.props.form.setFieldsValue({
+      roleChange: roleChangeItem.sysRole.id,
     })
   }
 
-  dismissModifyMemberModal = () => {
+  dismissModal = () => {
+    if (this.props.userInfoManager.modalConfirmLoading) {
+      return;
+    }
     this.setState({
       modifyMemberModalShow: false,
+      roleModalShow: false,
+      deleteModalShow: false,
     })
   }
+
   showModifyMemberModal = (isAdd) => {
     this.setState({
       modifyMemberModalShow: true,
@@ -117,7 +125,7 @@ export default class UserInfoManagement extends Component {
     this.props.dispatch({
       type: 'userInfoManager/queryRole',
       payload: {
-        errorCallBack: this.dismissModifyMemberModal,
+        errorCallBack: this.dismissModal,
       },
     })
 
@@ -137,25 +145,33 @@ export default class UserInfoManagement extends Component {
   }
 
   handleDeleteMember = () => {
-    const params = [];
-    params.push(
-      this.state.selectedItems.map(item => {
-       return {id: item.id}
-      })
-    )
+    const params = this.state.selectedItems.map(item => {
+      return {id: item.id}
+    });
 
     this.props.dispatch({
       type: 'userInfoManager/deleteMember',
       payload: {
         params: params,
-        successCallBack: this.changeDeleteModalShow,
+        successCallBack: this.handleSuccess,
       },
     })
   }
 
   handleRoleModify = () => {
-  }
-  handleRoleChange = (e) => {
+    const param = {
+      roleId: this.props.form.getFieldValue('roleChange'),
+      userId: this.state.roleChangeItem.id,
+    }
+    this.props.dispatch({
+      type: 'userInfoManager/changeRoles',
+      payload: {
+        params: param,
+        successCallBack: () => {
+          this.handleSuccess(true)
+        },
+      },
+    })
   }
 
   // 添加或修改成员
@@ -182,22 +198,23 @@ export default class UserInfoManagement extends Component {
         type: 'userInfoManager/modifyMember',
         payload: {
           params: param,
-          successCallBack: this.modifyMemberSuccess,
+          successCallBack: this.handleSuccess,
         },
       })
     })
   }
 
-  modifyMemberSuccess = () => {
-    this.dismissModifyMemberModal();
+  handleSuccess = (refreshCurrentPage) => {
+    this.dismissModal();
+    const newPageIndex = refreshCurrentPage ? this.state.pageIndex : 1;
     this.setState({
-      pageIndex: 1,
+      pageIndex: newPageIndex,
     })
     this.props.dispatch({
       type: 'userInfoManager/getInfoList',
       payload: {
         pageSize: this.state.pageSize,
-        pageNo: 1,
+        pageNo: newPageIndex,
       },
     });
   }
@@ -206,7 +223,7 @@ export default class UserInfoManagement extends Component {
     return (
       <RadioGroup className={styles.radio}>
         {roles.map(item => {
-          return <Radio value={item.id} key={item.id}>{item.name}</Radio>
+          return <Radio value={item.id}>{item.name}</Radio>
         })}
       </RadioGroup>
     )
@@ -218,7 +235,7 @@ export default class UserInfoManagement extends Component {
     const {modifyMemberModalShow, isAddMember, deleteModalShow, roleModalShow} = this.state
     const { getFieldDecorator } = this.props.form;
     const { list, roles, totalData } = this.props.userInfoManager;
-    const { pageLoading, modifyMemberLoading, rolesLoading } = this.props.userInfoManager;
+    const { pageLoading, modalConfirmLoading, rolesLoading } = this.props.userInfoManager;
 
     const Columns = [
       {
@@ -251,10 +268,8 @@ export default class UserInfoManagement extends Component {
       },
       {
         title: '角色类型',
-        render: item => <div><Popover content={item.sysRole.name} trigger="hover"><a style={{marginRight: '10px'}}>查看</a></Popover><a onClick={this.changeRoleModalShow}>分配</a></div>,
+        render: item => <div><Popover content={item.sysRole.name} trigger="hover"><a style={{marginRight: '10px'}}>查看</a></Popover><a onClick={() => this.roleModalShow(item)}>分配</a></div>,
       }]
-
-    const plainOptions = ['角色A','角色B','角色C','角色D','角色E','角色F','角色H','角色J']
 
     const rowSelection = {
       selectedRowKeys,
@@ -275,11 +290,12 @@ export default class UserInfoManagement extends Component {
     const ModifyModal = (
       <Modal
         width='70%'
+        destroyOnClose
         title={isAddMember?'成员添加':'成员修改'}
         visible={modifyMemberModalShow}
-        confirmLoading={modifyMemberLoading}
+        confirmLoading={modalConfirmLoading}
         onOk={() => this.handleModifyMember()}
-        onCancel={() => this.dismissModifyMemberModal()}
+        onCancel={() => this.dismissModal()}
       >
         <Spin spinning={rolesLoading}>
           <Form className={styles.addMemberForm}>
@@ -373,9 +389,10 @@ export default class UserInfoManagement extends Component {
     const DeleteModal = (
       <Modal
         title="成员删除"
+        confirmLoading={modalConfirmLoading}
         visible={deleteModalShow}
         onOk={() => this.handleDeleteMember()}
-        onCancel={() => this.changeDeleteModalShow()}
+        onCancel={() => this.dismissModal()}
       >
         {selectedItems.map(item => {
           return (
@@ -391,10 +408,19 @@ export default class UserInfoManagement extends Component {
       <Modal
         title="角色分配"
         visible={roleModalShow}
+        confirmLoading={modalConfirmLoading}
         onOk={() => this.handleRoleModify()}
-        onCancel={() => this.changeRoleModalShow()}
+        onCancel={() => this.dismissModal()}
       >
-        <RadioGroup className={styles.radio} options={plainOptions} defaultValue={['角色B']} onChange={this.handleRoleChange} />
+        <Spin spinning={rolesLoading}>
+          <Form>
+            <FormItem>
+              {getFieldDecorator('roleChange')(
+                this.renderRoleSelected(roles)
+              )}
+            </FormItem>
+          </Form>
+        </Spin>
       </Modal>
     )
 
@@ -408,7 +434,7 @@ export default class UserInfoManagement extends Component {
           />
           <Button className={styles.button} icon='plus' onClick={() => this.showModifyMemberModal(true)}>添加</Button>
           <Button className={styles.button} icon='edit' disabled={modifyBtnDisabled} onClick={() => this.showModifyMemberModal(false)}>修改</Button>
-          <Button className={styles.button} icon='delete' disabled={delegateBtnDisabled} onClick={this.changeDeleteModalShow}>删除</Button>
+          <Button className={styles.button} icon='delete' disabled={delegateBtnDisabled} onClick={this.deleteModalShow}>删除</Button>
         </div>
 
         <div className={styles.tableContainer}>

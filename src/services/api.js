@@ -101,7 +101,6 @@ export async function modifyMember(params) {
 }
 // 用户删除
 export async function deleteMember(params) {
-  console.log('------>',params)
   return request(`/api/sys/users/batch`, {
     method: 'DELETE',
     body: params,
@@ -110,4 +109,12 @@ export async function deleteMember(params) {
 // 角色查询
 export async function queryRole() {
   return request('/api/sys/roles');
+}
+// 用户角色变更
+export async function roleChange(params) {
+  console.log(params)
+  return request('/api/sys/users/bindRole', {
+    method: 'POST',
+    body: params,
+  })
 }
