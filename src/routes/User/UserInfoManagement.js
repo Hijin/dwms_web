@@ -230,12 +230,29 @@ export default class UserInfoManagement extends Component {
   }
 
   handleSearch = (value) => {
-    this.props.dispatch({
-      type: 'userInfoManager/searchUsers',
-      payload:{
-        keyword: value,
-      },
-    })
+    if (value.trim().length > 0) {
+      this.setState({
+        pageIndex: 1,
+        pageSize: 9999,
+      })
+      this.props.dispatch({
+        type: 'userInfoManager/searchUsers',
+        payload:{
+          keyword: value,
+        },
+      })
+    } else {
+      this.setState({
+        pageSize: 10,
+      })
+      this.props.dispatch({
+        type: 'userInfoManager/getInfoList',
+        payload: {
+          pageSize: this.state.pageSize,
+          pageNo: 1,
+        },
+      });
+    }
   }
 
   renderRoleSelected = (roles) => {

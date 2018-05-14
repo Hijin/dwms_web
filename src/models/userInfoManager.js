@@ -135,12 +135,14 @@ export default {
         type: 'pageLoading',
         payload: false,
       })
-      console.log(res)
       if (res.code === '0000') {
-        // yield put({
-        //   type: 'initPageList',
-        //   payload: res.data,
-        // })
+        yield put({
+          type: 'initPageList',
+          payload: {
+            content: res.data,
+            isSearch: true,
+          },
+        })
       } else {
         message.error(res.msg)
       }
@@ -170,7 +172,7 @@ export default {
       return {
         ...state,
         list: payload.content,
-        totalData: payload.totalElements,
+        totalData: payload.isSearch? payload.content.length : payload.totalElements,
       }
     },
     initRoles(state, { payload }) {
