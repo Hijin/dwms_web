@@ -112,8 +112,14 @@ export async function queryRole() {
 }
 // 用户角色变更
 export async function roleChange(params) {
-  console.log(params)
   return request('/api/sys/users/bindRole', {
+    method: 'POST',
+    body: params,
+  })
+}
+// 查找用户
+export async function searchUser(params) {
+  return request('', {
     method: 'POST',
     body: params,
   })

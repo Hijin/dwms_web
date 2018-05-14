@@ -219,6 +219,10 @@ export default class UserInfoManagement extends Component {
     });
   }
 
+  handleSearch = (value) => {
+
+  }
+
   renderRoleSelected = (roles) => {
     return (
       <RadioGroup className={styles.radio}>
@@ -429,8 +433,8 @@ export default class UserInfoManagement extends Component {
         <div>
           <InputSearch
             placeholder="请输入搜索字段"
-            onSearch={value => console.log(value)}
-            style={{ width: 200 }}
+            onSearch={value => this.handleSearch(value)}
+            style={{ width: 300 }}
           />
           <Button className={styles.button} icon='plus' onClick={() => this.showModifyMemberModal(true)}>添加</Button>
           <Button className={styles.button} icon='edit' disabled={modifyBtnDisabled} onClick={() => this.showModifyMemberModal(false)}>修改</Button>

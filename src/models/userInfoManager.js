@@ -2,7 +2,7 @@
  * Created by chennanjin on 2018/5/13.
  */
 import { message } from 'antd';
-import { getInfoList, addMember, queryRole, modifyMember, deleteMember, roleChange} from '../services/api';
+import { getInfoList, addMember, queryRole, modifyMember, deleteMember, roleChange, searchUser} from '../services/api';
 
 export default {
   namespace: 'userInfoManager',
@@ -123,6 +123,25 @@ export default {
           yield call(payload.errorCallBack
           )
         }
+      }
+    },
+    *searchUsers({ payload }, { call, put }) {
+      yield put({
+        type: 'pageLoading',
+        payload: true,
+      })
+      const res = yield call(searchUser, payload)
+      yield put({
+        type: 'pageLoading',
+        payload: false,
+      })
+      if (res.code === '0000') {
+        yield put({
+          type: 'initPageList',
+          payload: res.data,
+        })
+      } else {
+        message.error(res.msg)
       }
     },
   },
