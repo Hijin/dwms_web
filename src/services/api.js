@@ -1,4 +1,4 @@
-import { stringify } from 'qs';
+import {stringify} from 'qs';
 import request from '../utils/request';
 
 export async function queryProjectNotice() {
@@ -85,6 +85,7 @@ export async function getInfoList(params) {
     body: params,
   });
 }
+
 // 添加用户
 export async function addMember(params) {
   return request('/api/sys/users', {
@@ -92,6 +93,7 @@ export async function addMember(params) {
     body: params,
   });
 }
+
 // 用户修改
 export async function modifyMember(params) {
   return request(`/api/sys/users/${params.id}`, {
@@ -99,6 +101,7 @@ export async function modifyMember(params) {
     body: params,
   });
 }
+
 // 用户删除
 export async function deleteMember(params) {
   return request(`/api/sys/users/batch`, {
@@ -106,10 +109,12 @@ export async function deleteMember(params) {
     body: params,
   })
 }
+
 // 角色查询
 export async function queryRole() {
   return request('/api/sys/roles');
 }
+
 // 用户角色变更
 export async function roleChange(params) {
   return request('/api/sys/users/bindRole', {
@@ -117,10 +122,44 @@ export async function roleChange(params) {
     body: params,
   })
 }
+
 // 查找用户
 export async function searchUser(params) {
   return request('', {
     method: 'POST',
     body: params,
+  })
+}
+
+// 获取数据列表
+export async function getDataList(payload) {
+  // console.log(payload);
+  return request(payload.url, {
+    method: 'POST',
+    body: payload.params,
+  });
+}
+
+//修改数据
+export async function modifyData(payload) {
+  return request(payload.url + '/' + `${payload.params.id}`, {
+    method: 'PUT',
+    body: payload.params,
+  });
+}
+
+// 添加数据
+export async function addData(payload) {
+  return request(payload.url, {
+    method: 'POST',
+    body: payload.params,
+  });
+}
+
+// 用户删除
+export async function deleteData(payload) {
+  return request(payload.url, {
+    method: 'DELETE',
+    body: payload.params,
   })
 }
