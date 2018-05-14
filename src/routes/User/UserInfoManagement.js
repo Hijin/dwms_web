@@ -473,16 +473,17 @@ export default class UserInfoManagement extends Component {
         </div>
 
         <div className={styles.tableContainer}>
-          <Table
-            className={styles.table}
-            columns={Columns}
-            dataSource={list}
-            loading={pageLoading}
-            pagination={false}
-            rowSelection={rowSelection}
-            rowKey='id'
-            scroll={{y: 300}}
-          />
+          <div className={styles.preTable}>
+            <Table
+              className={styles.table}
+              columns={Columns}
+              dataSource={list}
+              loading={pageLoading}
+              pagination={false}
+              rowSelection={rowSelection}
+              rowKey='id'
+            />
+          </div>
         </div>
 
         <Pagination
