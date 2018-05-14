@@ -141,6 +141,16 @@ export default class UserInfoManagement extends Component {
         email: selectedItem.email,
         role: selectedItem.sysRole.id,
       })
+    } else {
+      this.props.form.setFieldsValue({
+        username: '',
+        realName: '',
+        sex: 'male',
+        status: 'enable',
+        tel: '',
+        email: '',
+        role: '',
+      })
     }
   }
 
@@ -294,7 +304,6 @@ export default class UserInfoManagement extends Component {
     const ModifyModal = (
       <Modal
         width='70%'
-        destroyOnClose
         title={isAddMember?'成员添加':'成员修改'}
         visible={modifyMemberModalShow}
         confirmLoading={modalConfirmLoading}
