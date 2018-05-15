@@ -126,13 +126,27 @@ export async function searchUser(params) {
 }
 // 新增角色
 export async function addRole(params) {
-  console.log(params)
   return request('/api/sys/roles', {
     method: 'POST',
+    body: params,
+  })
+}
+// 删除角色
+export async function removeRole(params) {
+  return request('/api/sys/roles/batch', {
+    method: 'DELETE',
     body: params,
   })
 }
 // 查找权限树
 export async function getAllPermission() {
   return request('/api/sys/acls/tree')
+}
+// 查找角色下对应用户
+export async function getRoleUsers(roleId) {
+  return request(`/api/sys/users/role/${roleId}`)
+}
+// 查找角色下对应的权限
+export async function getRolePermission(roleId) {
+  return request(`/api/sys/acls/roles/${roleId}`)
 }

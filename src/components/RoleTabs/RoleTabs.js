@@ -4,6 +4,7 @@
 import React, { Component } from 'react';
 import { connect } from 'dva';
 import { Table, Icon, Popconfirm, Modal, Tree, Transfer, Button, Spin } from 'antd';
+import _ from 'lodash';
 import styles from './RoleTabs.less'
 
 const TreeNode = Tree.TreeNode;
@@ -24,7 +25,30 @@ export default class RoleTabs extends Component {
   componentDidMount() {
     // 获取权限树
     this.props.dispatch({
-      type: 'permissionSetting/getPermissions',
+      type: 'permissionSetting/getRolePermission',
+      payload: {
+        params: this.props.roleId,
+        successCallBack: this.handleRolePermission,
+      },
+    })
+    this.props.dispatch({
+      type: 'permissionSetting/getRoleUsers',
+      payload: {
+        params: this.props.roleId,
+        successCallBack: this.handleRoleUsers,
+      },
+    })
+  }
+
+  testFun = () => {
+    console.log('-->',this.props.roleId)
+  }
+
+  handleRolePermission = () => {
+    this.setState({
+      checkedKeys : this.props.permissionSetting.rolePermission.map(item => {
+        return item.toString()
+      }),
     })
   }
 
@@ -34,6 +58,14 @@ export default class RoleTabs extends Component {
         return {...item, key: item.id, children:this.handlePermissionTree(item.children)}
       }
       return {...item, key: item.id}
+    })
+  }
+
+  handleRoleUsers = () => {
+    this.setState({
+      targetKeys: this.props.permissionSetting.roleUsers.map(item => {
+        return item.id
+      }),
     })
   }
 
@@ -121,28 +153,14 @@ export default class RoleTabs extends Component {
   }
 
   render() {
-    const { permissionTree, permissionTreeLoading } = this.props.permissionSetting
+    const { permissionTree, test,roleUsers, permissionTreeLoading, roleUserLoading } = this.props.permissionSetting
     const { checkedKeys } = this.state
     const treeWithKey = this.handlePermissionTree(permissionTree)
-    const member = [
-      {
-        Name: '用户1',
-        key: 1,
-      },
-      {
-        Name: '用户2',
-        key: 2,
-      },
-      {
-        Name: '用户3',
-        key: 3,
-      },
-    ];
 
     const Columns = [
       {
         title: '用户名',
-        dataIndex: 'Name',
+        dataIndex: 'username',
         key: 'name',
       },
       {
@@ -157,9 +175,9 @@ export default class RoleTabs extends Component {
     return (
       <div className={styles.main}>
         <div className={styles.list}>
-          <Spin>
+          <Spin spinning={roleUserLoading}>
             <div className={styles.listHeader}>
-              <span>用户成员</span>
+              <span>用户成员{test}</span>
               <a style={{marginLeft: '5px'}} onClick={this.editMemberModalShow}><Icon type="edit" /></a>
             </div>
             <div>
@@ -167,7 +185,7 @@ export default class RoleTabs extends Component {
                 className={styles.listTable}
                 showHeader={false}
                 columns={Columns}
-                dataSource={member}
+                dataSource={roleUsers}
                 pagination={false}
               />
             </div>

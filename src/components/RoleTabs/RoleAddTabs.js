@@ -79,7 +79,7 @@ export default class RoleTabs extends Component {
             name: fieldsValue['name'],
             remark: fieldsValue['remark'],
             members:this.state.targetKeys,
-            permissin: this.state.checkedKeys,
+            permission: this.state.checkedKeys,
           },
           successCallBack: this.handleAddSuccess,
         },

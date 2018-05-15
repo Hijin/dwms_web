@@ -5,7 +5,7 @@
  * Created by chennanjin on 2018/5/13.
  */
 import { message } from 'antd';
-import { queryRole, addRole, getAllPermission } from '../services/api';
+import { queryRole, addRole, getAllPermission, getRolePermission, getRoleUsers, removeRole } from '../services/api';
 
 export default {
   namespace: 'permissionSetting',
@@ -14,8 +14,11 @@ export default {
     allUsersLoading: false,
     permissionTreeLoading: false,
     rolesLoading: false,
+    roleUserLoading: false,
     roles: [],
     permissionTree: [],
+    roleUsers:[],
+    rolePermission: [],
   },
 
   effects: {
@@ -62,19 +65,93 @@ export default {
         }
       }
     },
+    *removeRole({ payload }, { call, put }) {
+      yield put({
+        type: 'changeRoleLoadingState',
+        payload: true,
+      })
+      const res = yield call(removeRole, payload.params)
+      yield put({
+        type: 'changeRoleLoadingState',
+        payload: false,
+      })
+      if (res.code === '0000') {
+        message.success('角色已删除')
+        if(payload.successCallBack) {
+          yield call(payload.successCallBack)
+        }
+      } else {
+        message.error(res.msg)
+        if(payload.errorCallBack) {
+          yield call(payload.errorCallBack)
+        }
+      }
+    },
     *getPermissions({ payload }, {call, put }) {
+      yield put({
+          type: 'changePermissionTreeLoading',
+          payload: true,
+        })
+        const res = yield call(getAllPermission)
+        yield put({
+          type: 'changePermissionTreeLoading',
+          payload: false,
+        })
+        if (res.code === '0000') {
+          yield put({
+            type: 'initPermissionTree',
+            payload: res.data,
+          })
+          if (payload && payload.successCallBack) {
+            yield call(payload.successCallBack)
+          }
+        } else {
+          message.error(res.msg)
+          if (payload && payload.errorCallBack) {
+            yield call(payload.errorCallBack)
+          }
+      }
+    },
+    *getRoleUsers({ payload }, { call, put}) {
+      yield put({
+        type: 'changeRoleUserLoading',
+        payload: true,
+      })
+      const res = yield call(getRoleUsers, payload.params)
+      yield put({
+        type: 'changeRoleUserLoading',
+        payload: false,
+      })
+      if (res.code === '0000') {
+        yield put({
+          type: 'initRoleUsers',
+          payload: res.data.map(item => {
+            return { ...item, key:item.id}
+          }),
+        })
+        if (payload.successCallBack) {
+          yield call(payload.successCallBack)
+        }
+      } else {
+        message.error(res.msg);
+        if (payload.errorCallBack) {
+          yield call(payload.errorCallBack)
+        }
+      }
+    },
+    *getRolePermission({ payload }, { call, put}){
       yield put({
         type: 'changePermissionTreeLoading',
         payload: true,
       })
-      const res = yield call(getAllPermission)
+      const res = yield call(getRolePermission, payload.params)
       yield put({
         type: 'changePermissionTreeLoading',
         payload: false,
       })
       if (res.code === '0000') {
         yield put({
-          type: 'initPermissionTree',
+          type: 'initRolePermission',
           payload: res.data,
         })
         if (payload && payload.successCallBack) {
@@ -102,6 +179,12 @@ export default {
         permissionTreeLoading: payload,
       }
     },
+    changeRoleUserLoading(state, { payload }) {
+      return {
+        ...state,
+        roleUserLoading: payload,
+      }
+    },
     initPermissionTree(state, { payload }) {
       return {
         ...state,
@@ -112,6 +195,18 @@ export default {
       return {
         ...state,
         roles: payload,
+      }
+    },
+    initRoleUsers(state, { payload }) {
+      return {
+        ...state,
+        roleUsers: payload,
+      }
+    },
+    initRolePermission(state, { payload }) {
+      return {
+        ...state,
+        rolePermission: payload,
       }
     },
   },
