@@ -142,7 +142,7 @@ export const getRouterData = app => {
       component: dynamicWrapper(app, ['userInfoManager'], () => import('../routes/User/UserInfoManagement')),
     },
     '/userManagement/permissionSet': {
-      component: dynamicWrapper(app, [], () => import('../routes/User/PermissionSetting')),
+      component: dynamicWrapper(app, ['permissionSetting', 'userInfoManager'], () => import('../routes/User/PermissionSetting')),
     },
 
 

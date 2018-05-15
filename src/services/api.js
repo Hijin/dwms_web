@@ -124,3 +124,15 @@ export async function searchUser(params) {
     body: params,
   })
 }
+// 新增角色
+export async function addRole(params) {
+  console.log(params)
+  return request('/api/sys/roles', {
+    method: 'POST',
+    body: params,
+  })
+}
+// 查找权限树
+export async function getAllPermission() {
+  return request('/api/sys/acls/tree')
+}

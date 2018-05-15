@@ -238,7 +238,9 @@ export default class UserInfoManagement extends Component {
       this.props.dispatch({
         type: 'userInfoManager/searchUsers',
         payload:{
-          keyword: value,
+          params: {
+            keyword: value,
+          },
         },
       })
     } else {
@@ -277,33 +279,40 @@ export default class UserInfoManagement extends Component {
       {
         title: '用户名',
         dataIndex: 'username',
+        key: 'username',
       },
       {
         title: '姓名',
         dataIndex: 'realName',
+        key: 'realName',
       },
       {
         title: '性别',
         dataIndex: 'sex',
+        key: 'sex',
         render: sex => <div>{sex === 1 ? '男':'女'}</div>,
       },
       {
         title: '邮箱',
         dataIndex: 'email',
+        key: 'email',
         render: email => <div>{email ? email:'-'}</div>,
       },
       {
         title: '电话号码',
         dataIndex: 'tel',
+        key: 'tel',
         render: tel => <div>{tel ? tel:'-'}</div>,
       },
       {
         title: '状态',
         dataIndex: 'status',
+        key: 'status',
         render: status => <div>{status === 1 ? '可用':'不可用'}</div>,
       },
       {
         title: '角色类型',
+        key: 'role',
         render: item => <div><Popover content={item.sysRole.name} trigger="hover"><a style={{marginRight: '10px'}}>查看</a></Popover><a onClick={() => this.roleModalShow(item)}>分配</a></div>,
       }]
 
@@ -481,7 +490,6 @@ export default class UserInfoManagement extends Component {
               loading={pageLoading}
               pagination={false}
               rowSelection={rowSelection}
-              rowKey='id'
             />
           </div>
         </div>
