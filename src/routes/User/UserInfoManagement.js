@@ -395,7 +395,7 @@ export default class UserInfoManagement extends Component {
                 initialValue: 'enable',
                 rules: [{ required: false, message: '请分配角色!' }],
               })(
-                <Select initialValue="enable">
+                <Select>
                   <Option value="enable" >可用</Option>
                   <Option value="disable" >不可用</Option>
                 </Select>
