@@ -20,6 +20,7 @@ export default class PermissionSetting extends Component {
   state = {
     deleteModalShow: false,
     deleteRole: {},
+    activeKey: '-1',
   }
 
   componentDidMount() {
@@ -29,10 +30,7 @@ export default class PermissionSetting extends Component {
   }
 
   changeTabs = (activeKey) => {
-    console.log(this.refs)
-    // if (this.refs[`RoleTabs${activeKey}`]) {
-    //   this.refs[`RoleTabs${activeKey}`].testFun()
-    // }
+    this.setState({activeKey})
   }
 
   deleteRole = () => {
@@ -89,6 +87,7 @@ export default class PermissionSetting extends Component {
   render() {
     const { rolesLoading } = this.props.permissionSetting
     const { roles } = this.props.permissionSetting
+    const { activeKey } = this.state
 
     return (
       <div className={styles.main}>
@@ -99,16 +98,17 @@ export default class PermissionSetting extends Component {
             onChange={this.changeTabs}
             type="editable-card"
             onEdit={this.editTabs}
+            activeKey={activeKey}
           >
-            {roles.map((item) => {
-              return (
-                <TabPane tab={item.name} key={item.id}>
-                  <RoleTabs roleId={item.id} ref={this.setRefs(item.id)} />
-                </TabPane>)
-            })}
             <TabPane tab="+ 新建角色" key="-1" closable={false}>
               <RoleAddTabs />
             </TabPane>
+            {roles.map((item) => {
+              return (
+                <TabPane tab={item.name} key={item.id}>
+                  <RoleTabs roleId={item.id} activeKey={activeKey} />
+                </TabPane>)
+            })}
           </Tabs>
         </Spin>
         {this.renderDeleteModal()}

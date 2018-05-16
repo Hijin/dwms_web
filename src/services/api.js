@@ -150,3 +150,11 @@ export async function getRoleUsers(roleId) {
 export async function getRolePermission(roleId) {
   return request(`/api/sys/acls/roles/${roleId}`)
 }
+
+// 角色绑定用户
+export async function roleBindUsers(params) {
+  return request('/api/sys/roles/bindUser', {
+    method: 'PUT',
+    body: params,
+  })
+}

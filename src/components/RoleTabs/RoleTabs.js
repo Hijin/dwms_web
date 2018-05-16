@@ -15,33 +15,68 @@ const TreeNode = Tree.TreeNode;
   }),
 )
 export default class RoleTabs extends Component {
-
   state = {
     editMemberModalShow: false,
     targetKeys: [],
     checkedKeys: [],
+    refresh: true,
   }
 
   componentDidMount() {
-    // 获取权限树
+    this.refreshPage()
+  }
+
+  componentWillReceiveProps (nextProps) {
+    if (nextProps.activeKey === nextProps.roleId.toString() && !this.state.refresh) {
+      this.refreshPage()
+    }
+  }
+
+  refreshPage = () => {
+    console.log('刷新')
+    this.setState({
+      refresh: true,
+    })
+    let finishRolePermission = false
+    let finishRoleUsers = false
     this.props.dispatch({
       type: 'permissionSetting/getRolePermission',
       payload: {
         params: this.props.roleId,
-        successCallBack: this.handleRolePermission,
+        successCallBack: () => {
+          finishRolePermission = true
+          this.setState({
+            refresh: !finishRoleUsers,
+          })
+          this.handleRolePermission()
+        },
+        errorCallBack: () => {
+          finishRolePermission = true
+          this.setState({
+            refresh: !finishRoleUsers,
+          })
+        },
       },
     })
     this.props.dispatch({
       type: 'permissionSetting/getRoleUsers',
       payload: {
         params: this.props.roleId,
-        successCallBack: this.handleRoleUsers,
+        successCallBack: () => {
+          finishRoleUsers = true
+          this.setState({
+            refresh: !finishRolePermission,
+          })
+          this.handleRoleUsers()
+        },
+        errorCallBack: () => {
+          finishRoleUsers = true
+          this.setState({
+            refresh: !finishRolePermission,
+          })
+        },
       },
     })
-  }
-
-  testFun = () => {
-    console.log('-->',this.props.roleId)
   }
 
   handleRolePermission = () => {
@@ -91,8 +126,9 @@ export default class RoleTabs extends Component {
     })
   }
 
-  deleteMember = () => {
-    console.log('删除成员')
+  deleteMember = (item) => {
+    this.state.targetKeys.splice(this.state.targetKeys.indexOf(item.id),1)
+    this.handleEditMember();
   }
 
   onCheckPermission = (checkedKeys) => {
@@ -108,10 +144,33 @@ export default class RoleTabs extends Component {
   }
 
   handleEditMember = () => {
-
+    this.props.dispatch({
+      type: 'permissionSetting/bindUsers',
+      payload: {
+        params: {
+          id: this.props.roleId,
+          userIds: this.state.targetKeys,
+        },
+        isBindUser: true,
+        successCallBack: this.editMemberModalDismiss,
+      },
+    })
   }
 
   savePermissionChange = () => {
+    this.props.dispatch({
+      type: 'permissionSetting/bindUsers',
+      payload: {
+        params: {
+          id: this.props.roleId,
+          aclIds: this.state.checkedKeys.map(item => {
+            return parseInt(item)
+          }),
+        },
+        isBindUser: false,
+        successCallBack: this.handleRolePermission,
+      },
+    })
   }
 
   renderTreeNodes = (data) => {
@@ -153,7 +212,7 @@ export default class RoleTabs extends Component {
   }
 
   render() {
-    const { permissionTree, test,roleUsers, permissionTreeLoading, roleUserLoading } = this.props.permissionSetting
+    const { permissionTree, roleUsers, permissionTreeLoading, roleUserLoading } = this.props.permissionSetting
     const { checkedKeys } = this.state
     const treeWithKey = this.handlePermissionTree(permissionTree)
 
@@ -166,8 +225,8 @@ export default class RoleTabs extends Component {
       {
         title: '操作',
         key: 'op',
-        render: () => (
-          <Popconfirm title="确定删除该成员？" okText="确定" cancelText="取消" onConfirm={this.deleteMember}>
+        render: (item) => (
+          <Popconfirm title="确定删除该成员？" okText="确定" cancelText="取消" onConfirm={() => this.deleteMember(item)}>
             <a><Icon type="user-delete" /></a>
           </Popconfirm>),
       },
@@ -177,7 +236,7 @@ export default class RoleTabs extends Component {
         <div className={styles.list}>
           <Spin spinning={roleUserLoading}>
             <div className={styles.listHeader}>
-              <span>用户成员{test}</span>
+              <span>用户成员</span>
               <a style={{marginLeft: '5px'}} onClick={this.editMemberModalShow}><Icon type="edit" /></a>
             </div>
             <div>

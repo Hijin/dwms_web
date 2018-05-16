@@ -5,7 +5,7 @@
  * Created by chennanjin on 2018/5/13.
  */
 import { message } from 'antd';
-import { queryRole, addRole, getAllPermission, getRolePermission, getRoleUsers, removeRole } from '../services/api';
+import { queryRole, addRole, getAllPermission, getRolePermission, getRoleUsers, removeRole, roleBindUsers } from '../services/api';
 
 export default {
   namespace: 'permissionSetting',
@@ -160,6 +160,29 @@ export default {
       } else {
         message.error(res.msg)
         if (payload && payload.errorCallBack) {
+          yield call(payload.errorCallBack)
+        }
+      }
+    },
+    *bindUsers({ payload }, { call, put}) {
+      const { isBindUser } = payload
+      yield put({
+        type: isBindUser? 'changeRoleUserLoading':'changePermissionTreeLoading',
+        payload: true,
+      })
+      const res = yield call(roleBindUsers, payload.params)
+      yield put({
+        type: isBindUser? 'changeRoleUserLoading':'changePermissionTreeLoading',
+        payload: false,
+      })
+      if (res.code === '0000') {
+        message.success(isBindUser? '成员已修改':'权限已修改')
+        if (payload.successCallBack) {
+          yield call(payload.successCallBack)
+        }
+      }else {
+        message.error(res.msg)
+        if (payload.errorCallBack) {
           yield call(payload.errorCallBack)
         }
       }
