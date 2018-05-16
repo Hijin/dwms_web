@@ -5,7 +5,7 @@
  * Created by chennanjin on 2018/5/13.
  */
 import { message } from 'antd';
-import { queryRole, addRole, getAllPermission, getRolePermission, getRoleUsers, removeRole, roleBindUsers } from '../services/api';
+import { queryRole, addRole, getAllPermission, getRolePermission, getRoleUsers, removeRole, roleBindUsers, roleBindPermission } from '../services/api';
 
 export default {
   namespace: 'permissionSetting',
@@ -170,7 +170,7 @@ export default {
         type: isBindUser? 'changeRoleUserLoading':'changePermissionTreeLoading',
         payload: true,
       })
-      const res = yield call(roleBindUsers, payload.params)
+      const res = yield call(isBindUser ? roleBindUsers: roleBindPermission, payload.params)
       yield put({
         type: isBindUser? 'changeRoleUserLoading':'changePermissionTreeLoading',
         payload: false,
