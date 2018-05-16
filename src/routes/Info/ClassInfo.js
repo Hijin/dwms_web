@@ -14,7 +14,6 @@ const ButtonGroup = Button.Group;
 @Form.create()
 export default class ClassInfo extends Component {
   state = {
-    selectedValue: 'all',
     searchInput: '',
     selectedRowKeys: [],
     selectedRowItems: [],
@@ -157,17 +156,8 @@ export default class ClassInfo extends Component {
     this.setState({searchInput: e.target.value})
   }
 
-  handleSelected = (value) => {
-    this.setState({selectedValue: value})
-    // TODO(按状态搜索)
-  }
-
-  resetSearch = () => {
-    this.setState({
-      selectedValue: 'all',
-      searchInput: '',
-    })
-    // TODO(初始化搜索所有)
+  export = () => {
+    // TODO(导出报表)
   }
 
   renderModalModify = () => {
@@ -253,7 +243,7 @@ export default class ClassInfo extends Component {
   }
 
   render() {
-    const { selectedValue, searchInput, selectedRowKeys, dataSource, pageSize, pageIndex, buttonGroup, modifyBtnDisabled,
+    const { searchInput, selectedRowKeys, dataSource, pageSize, pageIndex, buttonGroup, modifyBtnDisabled,
       delegateBtnDisabled } = this.state
 
     const columns = [{
@@ -293,26 +283,14 @@ export default class ClassInfo extends Component {
               value={searchInput}
               enterButton
             />
-            <div className={styles.select}>
-              <span>状态</span>
-              <Select
-                defaultValue='all'
-                value={selectedValue}
-                onChange={this.handleSelected}
-              >
-                <Option value="all">全部</Option>
-                <Option value="enable">启用</Option>
-                <Option value="disable">关闭</Option>
-              </Select>
+            <div className={styles.buttonGroup}>
+              <ButtonGroup onClick={this.onButtonGroup}>
+                <Button value={buttonGroup.ADD}>新增</Button>
+                <Button value={buttonGroup.MODIFY} disabled={modifyBtnDisabled}>修改</Button>
+                <Button value={buttonGroup.DELETE} disabled={delegateBtnDisabled}>删除</Button>
+              </ButtonGroup>
             </div>
-            <Button className={styles.resetBtn}  type='primary' icon='retweet' onClick={this.resetSearch}>重置</Button>
-          </div>
-          <div>
-            <ButtonGroup onClick={this.onButtonGroup}>
-              <Button value={buttonGroup.ADD}>新增</Button>
-              <Button value={buttonGroup.MODIFY} disabled={modifyBtnDisabled}>修改</Button>
-              <Button value={buttonGroup.DELETE} disabled={delegateBtnDisabled}>删除</Button>
-            </ButtonGroup>
+            <Button className={styles.exportBtn}  type='primary' icon='download' onClick={this.export}>导出</Button>
           </div>
           <Table
             className={styles.table}
