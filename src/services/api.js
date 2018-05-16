@@ -158,3 +158,10 @@ export async function roleBindUsers(params) {
     body: params,
   })
 }
+// 角色绑定权限
+export async function roleBindPermission(params) {
+  return request('/api/sys/roles/bindAcl', {
+    method: 'PUT',
+    body: params,
+  })
+}

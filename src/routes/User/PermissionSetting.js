@@ -94,6 +94,7 @@ export default class PermissionSetting extends Component {
         <Spin spinning={rolesLoading}>
           <Tabs
             className={styles.tabs}
+            hideAdd
             animated
             onChange={this.changeTabs}
             type="editable-card"

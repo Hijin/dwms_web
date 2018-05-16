@@ -33,7 +33,6 @@ export default class RoleTabs extends Component {
   }
 
   refreshPage = () => {
-    console.log('刷新')
     this.setState({
       refresh: true,
     })

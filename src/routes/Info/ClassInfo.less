@@ -1,0 +1,74 @@
+@import "~antd/lib/style/themes/default.less";
+@import "../../utils/utils.less";
+
+.body {
+  .containerBody;
+}
+
+.container {
+  .hFull;
+  .wFull;
+  .bgGray;
+  .r-5;
+  .flex-column;
+  .p10;
+}
+.header {
+  .wFull;
+  .flex-row;
+  .h-60;
+  .flex-center-h;
+}
+
+.searchBar{
+  .w-300;
+}
+
+.select {
+  .ml30;
+  .w-200;
+  .flex-row;
+  .flex-center-h;
+  :global {
+    .ant-select{
+      .ml10;
+      .flex-1;
+    }
+  }
+}
+
+.resetBtn{
+  .ml30;
+}
+
+.table {
+  .bgWhite;
+  .mt10;
+  .flex-1;
+  .b-w-1;
+  .b-r-10;
+  .over-hidden;
+}
+
+.pagination {
+  .paginationAll;
+}
+
+.form {
+  .flex-row;
+  flex-wrap: wrap;
+  :global {
+    .ant-row {
+      .flex-row;
+      .w-half;
+      .pl15;
+      .pr15;
+      div:first-child {
+        .flex-1;
+      }
+      div:last-child {
+        .flex-2;
+      }
+    }
+  }
+}
