@@ -121,7 +121,7 @@ export const getRouterData = app => {
       component: dynamicWrapper(app, [], () => import('../routes/Info/StockInfo')),
     },
     '/infoManagement/materialKindInfo': {
-      component: dynamicWrapper(app, [], () => import('../routes/Info/MaterialKindInfo')),
+      component: dynamicWrapper(app, ['materialKindManager'], () => import('../routes/Info/MaterialKindInfo')),
     },
     '/infoManagement/materialInfo': {
       component: dynamicWrapper(app, [], () => import('../routes/Info/MaterialInfo')),
