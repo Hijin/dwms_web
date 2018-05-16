@@ -53,3 +53,22 @@
 .pagination {
   .paginationAll;
 }
+
+.form {
+  .flex-row;
+  flex-wrap: wrap;
+  :global {
+    .ant-row {
+      .flex-row;
+      .w-half;
+      .pl15;
+      .pr15;
+      div:first-child {
+        .flex-1;
+      }
+      div:last-child {
+        .flex-2;
+      }
+    }
+  }
+}

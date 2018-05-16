@@ -261,7 +261,7 @@ export default class UserInfoManagement extends Component {
     return (
       <RadioGroup className={styles.radio}>
         {roles.map(item => {
-          return <Radio value={item.id}>{item.name}</Radio>
+          return <Radio value={item.id} key={item.id}>{item.name}</Radio>
         })}
       </RadioGroup>
     )
@@ -440,7 +440,7 @@ export default class UserInfoManagement extends Component {
       >
         {selectedItems.map(item => {
           return (
-            <div>
+            <div key={item.id}>
               {item.username}
             </div>
           )

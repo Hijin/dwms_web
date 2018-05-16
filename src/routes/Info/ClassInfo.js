@@ -2,15 +2,17 @@
  * Created by chennanjin on 2018/5/9.
  */
 import React, { Component } from 'react';
-import { Table, Input, Button, Select, Pagination, Radio, Form, Spin, Modal } from 'antd';
+import { Table, Input, Button, Select, Pagination, Form, Spin, Modal } from 'antd';
 import styles from './ClassInfo.less';
+import _ from 'lodash';
 
 const { Search } = Input;
 const { Option } = Select;
 const FormItem = Form.Item;
+const ButtonGroup = Button.Group;
 
 @Form.create()
-export default class Application extends Component {
+export default class ClassInfo extends Component {
   state = {
     selectedValue: 'all',
     searchInput: '',
@@ -26,17 +28,13 @@ export default class Application extends Component {
       'DELETE': 'delete',
       'ADD' : 'add',
       'MODIFY': 'modify',
-    }
+    },
+    modifyBtnDisabled: true,
+    delegateBtnDisabled: true,
   }
 
   componentDidMount() {
     this.getDataSource()
-  }
-
-  dismissModalModify = () => {
-    this.setState({
-      modalModifyShow: false,
-    })
   }
 
   onConfirmModify = () => {
@@ -56,8 +54,36 @@ export default class Application extends Component {
     })
   }
 
-  onTableSelectChange = (selectedRowKeys) => {
-    this.setState({selectedRowKeys})
+  onDeleteClass = () => {
+    // TODO (删除成员)
+  }
+
+  onTableSelectChange = (selectedRowKeys, selectedItems) => {
+    const allItems = selectedItems.concat(this.state.selectedRowItems)
+    // 数组去重
+    const uniqItems = []
+    for (let i = 0 ; i < allItems.length ; i++) {
+      let has = false;
+      for (let j = 0 ; j < uniqItems.length ; j++) {
+        if (allItems[i].key === uniqItems[j].key) {
+          has = true
+          break
+        }
+      }
+      if (!has) {
+        uniqItems.push(allItems[i])
+      }
+    }
+    const newSelectedItems = _.filter(uniqItems, item => {
+      return selectedRowKeys.indexOf(item.key) >= 0
+    })
+
+    this.setState({
+      selectedRowKeys,
+      selectedRowItems: newSelectedItems,
+      modifyBtnDisabled: selectedRowKeys.length !== 1,
+      delegateBtnDisabled: selectedRowKeys.length === 0,
+    })
   }
 
   onPaginationChange = (page) => {
@@ -66,13 +92,24 @@ export default class Application extends Component {
     });
   }
 
-  onOptionChange = (e) => {
+  onButtonGroup = (e) => {
     const { value } = e.target
     const { buttonGroup, selectedRowItems } = this.state
     if (value === buttonGroup.ADD) {
       this.setState({
         modalModifyShow: true,
         modalModifyAdd: true,
+      })
+      this.props.form.setFieldsValue({
+        classCode: '',
+        className: '',
+        state: 'enable',
+        remark: '',
+      })
+    } else if (value === buttonGroup.MODIFY ) {
+      this.setState({
+        modalModifyShow: true,
+        modalModifyAdd: false,
       })
       const selectedItem = selectedRowItems[0]
       this.props.form.setFieldsValue({
@@ -81,19 +118,10 @@ export default class Application extends Component {
         state: selectedItem.state === 1 ? 'enable':'disable',
         remark: selectedItem.remark,
       })
-    } else if (value === buttonGroup.MODIFY ) {
-      this.setState({
-        modalModifyShow: true,
-        modalModifyAdd: false,
-      })
-      this.props.form.setFieldsValue({
-        classCode: '',
-        className: '',
-        state: 'enable',
-        remark: '',
-      })
     } else if (value === buttonGroup.DELETE) {
-
+      this.setState({
+        modalDeleteShow: true,
+      })
     }
   }
 
@@ -110,6 +138,13 @@ export default class Application extends Component {
     }
     this.setState({
       dataSource: data,
+    })
+  }
+
+  dismissModal = () => {
+    this.setState({
+      modalModifyShow: false,
+      modalDeleteShow: false,
     })
   }
 
@@ -135,17 +170,18 @@ export default class Application extends Component {
     // TODO(初始化搜索所有)
   }
 
-  renderModal = () => {
+  renderModalModify = () => {
     const { modalModifyShow, modalModifyAdd } = this.state
     const { getFieldDecorator } = this.props.form;
     return (
       <Modal
+        width='70%'
         title={modalModifyAdd? '班级添加' : '班级修改'}
         visible={modalModifyShow}
         onOk={this.onConfirmModify}
-        onCancel={this.dismissModalModify}
+        onCancel={this.dismissModal}
       >
-        <Form>
+        <Form className={styles.form}>
           <FormItem
             label="班级编号"
           >
@@ -196,8 +232,29 @@ export default class Application extends Component {
     )
   }
 
+  renderModalDelete = () => {
+    const { modalDeleteShow, selectedRowItems } = this.state
+    return (
+      <Modal
+        title='班级删除'
+        visible={modalDeleteShow}
+        onOk={this.onDeleteClass}
+        onCancel={this.dismissModal}
+      >
+        {selectedRowItems.map(item => {
+          return (
+            <div key={item.key}>
+              {item.className}
+            </div>
+          )
+        })}
+      </Modal>
+    )
+  }
+
   render() {
-    const { selectedValue, searchInput, selectedRowKeys, dataSource, pageSize, pageIndex, buttonGroup } = this.state
+    const { selectedValue, searchInput, selectedRowKeys, dataSource, pageSize, pageIndex, buttonGroup, modifyBtnDisabled,
+      delegateBtnDisabled } = this.state
 
     const columns = [{
       title: '班级编号',
@@ -251,11 +308,11 @@ export default class Application extends Component {
             <Button className={styles.resetBtn}  type='primary' icon='retweet' onClick={this.resetSearch}>重置</Button>
           </div>
           <div>
-            <Radio.Group onChange={this.onOptionChange}>
-              <Radio.Button value={buttonGroup.ADD}>新增</Radio.Button>
-              <Radio.Button value={buttonGroup.MODIFY}>修改</Radio.Button>
-              <Radio.Button value={buttonGroup.DELETE}>删除</Radio.Button>
-            </Radio.Group>
+            <ButtonGroup onClick={this.onButtonGroup}>
+              <Button value={buttonGroup.ADD}>新增</Button>
+              <Button value={buttonGroup.MODIFY} disabled={modifyBtnDisabled}>修改</Button>
+              <Button value={buttonGroup.DELETE} disabled={delegateBtnDisabled}>删除</Button>
+            </ButtonGroup>
           </div>
           <Table
             className={styles.table}
@@ -272,6 +329,8 @@ export default class Application extends Component {
             current={pageIndex}
             onChange={this.onPaginationChange}
           />
+          {this.renderModalModify()}
+          {this.renderModalDelete()}
         </div>
       </div>
     )
