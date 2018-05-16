@@ -74,10 +74,6 @@ export default function request(url, options) {
   return fetch(baseURL + url, newOptions)
     .then(checkStatus)
     .then(response => {
-      if (response.status === 204) {
-        return response.text();
-      }
-
       return response.json();
     })
     .catch(e => {

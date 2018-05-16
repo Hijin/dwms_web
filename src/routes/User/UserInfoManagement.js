@@ -141,6 +141,16 @@ export default class UserInfoManagement extends Component {
         email: selectedItem.email,
         role: selectedItem.sysRole.id,
       })
+    } else {
+      this.props.form.setFieldsValue({
+        username: '',
+        realName: '',
+        sex: 'male',
+        status: 'enable',
+        tel: '',
+        email: '',
+        role: '',
+      })
     }
   }
 
@@ -220,7 +230,31 @@ export default class UserInfoManagement extends Component {
   }
 
   handleSearch = (value) => {
-
+    if (value.trim().length > 0) {
+      this.setState({
+        pageIndex: 1,
+        pageSize: 9999,
+      })
+      this.props.dispatch({
+        type: 'userInfoManager/searchUsers',
+        payload:{
+          params: {
+            keyword: value,
+          },
+        },
+      })
+    } else {
+      this.setState({
+        pageSize: 10,
+      })
+      this.props.dispatch({
+        type: 'userInfoManager/getInfoList',
+        payload: {
+          pageSize: this.state.pageSize,
+          pageNo: 1,
+        },
+      });
+    }
   }
 
   renderRoleSelected = (roles) => {
@@ -245,33 +279,40 @@ export default class UserInfoManagement extends Component {
       {
         title: '用户名',
         dataIndex: 'username',
+        key: 'username',
       },
       {
         title: '姓名',
         dataIndex: 'realName',
+        key: 'realName',
       },
       {
         title: '性别',
         dataIndex: 'sex',
+        key: 'sex',
         render: sex => <div>{sex === 1 ? '男':'女'}</div>,
       },
       {
         title: '邮箱',
         dataIndex: 'email',
+        key: 'email',
         render: email => <div>{email ? email:'-'}</div>,
       },
       {
         title: '电话号码',
         dataIndex: 'tel',
+        key: 'tel',
         render: tel => <div>{tel ? tel:'-'}</div>,
       },
       {
         title: '状态',
         dataIndex: 'status',
+        key: 'status',
         render: status => <div>{status === 1 ? '可用':'不可用'}</div>,
       },
       {
         title: '角色类型',
+        key: 'role',
         render: item => <div><Popover content={item.sysRole.name} trigger="hover"><a style={{marginRight: '10px'}}>查看</a></Popover><a onClick={() => this.roleModalShow(item)}>分配</a></div>,
       }]
 
@@ -294,7 +335,6 @@ export default class UserInfoManagement extends Component {
     const ModifyModal = (
       <Modal
         width='70%'
-        destroyOnClose
         title={isAddMember?'成员添加':'成员修改'}
         visible={modifyMemberModalShow}
         confirmLoading={modalConfirmLoading}
@@ -442,16 +482,16 @@ export default class UserInfoManagement extends Component {
         </div>
 
         <div className={styles.tableContainer}>
-          <Table
-            className={styles.table}
-            columns={Columns}
-            dataSource={list}
-            loading={pageLoading}
-            pagination={false}
-            rowSelection={rowSelection}
-            rowKey='id'
-            scroll={{y: 300}}
-          />
+          <div className={styles.preTable}>
+            <Table
+              className={styles.table}
+              columns={Columns}
+              dataSource={list}
+              loading={pageLoading}
+              pagination={false}
+              rowSelection={rowSelection}
+            />
+          </div>
         </div>
 
         <Pagination

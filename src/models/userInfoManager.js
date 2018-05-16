@@ -108,7 +108,9 @@ export default {
       if (response.code === '0000') {
         yield put({
           type: 'initRoles',
-          payload: response.data,
+          payload: response.data.map((item) => {
+            return {...item, key: item.id}
+          }),
         })
         if (!response.data || response.data.length === 0) {
           message.error('没有查询到角色信息，请先添加角色信息！')
@@ -130,7 +132,7 @@ export default {
         type: 'pageLoading',
         payload: true,
       })
-      const res = yield call(searchUser, payload)
+      const res = yield call(searchUser, payload.params)
       yield put({
         type: 'pageLoading',
         payload: false,
@@ -138,10 +140,19 @@ export default {
       if (res.code === '0000') {
         yield put({
           type: 'initPageList',
-          payload: res.data,
+          payload: {
+            content: res.data,
+            isSearch: true,
+          },
         })
+        if (payload.successCallBack) {
+          yield call(payload.successCallBack)
+        }
       } else {
         message.error(res.msg)
+        if (payload.errorCallBack) {
+          yield call(payload.errorCallBack)
+        }
       }
     },
   },
@@ -168,8 +179,10 @@ export default {
     initPageList(state, {payload}) {
       return {
         ...state,
-        list: payload.content,
-        totalData: payload.totalElements,
+        list: payload.content.map(item => {
+          return {...item, key: item.id}
+        }),
+        totalData: payload.isSearch? payload.content.length : payload.totalElements,
       }
     },
     initRoles(state, { payload }) {
